@@ -48,11 +48,6 @@ export default (app: Probot) => {
     for (const repo of context.payload?.repositories_removed || []) {
       logger.info(`Removing schedules and rules for ${repo.full_name}`)
       await schedulerService.deleteSchedules(repo.full_name);
-      await railcrossService.toggleProtection(
-        repo.full_name,
-        context.octokit as any,
-        false,
-      );
     }
   });
 
@@ -63,11 +58,6 @@ export default (app: Probot) => {
     for (const repo of context.payload?.repositories || []) {
       logger.info(`Uninstalling schedules and rules for ${repo.full_name}`)
       await schedulerService.deleteSchedules(repo.full_name);
-      await railcrossService.toggleProtection(
-          repo.full_name,
-          context.octokit as any,
-          false,
-      );
     }
   });
 };
