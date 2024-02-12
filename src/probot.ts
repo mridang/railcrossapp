@@ -44,7 +44,7 @@ export default (app: Probot) => {
     logger.info(`Some repositories removed on @${account.login}`);
 
     for (const repo of context.payload?.repositories_removed || []) {
-      await schedulerService.addLockSchedules(repo.full_name, id);
+      await schedulerService.deleteSchedules(repo.full_name);
       await railcrossService.toggleProtection(
         repo.full_name,
         context.octokit as any,
