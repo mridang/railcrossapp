@@ -15,14 +15,17 @@ export default class SchedulerService {
   });
   private schedulerRoleArn = `arn:aws:iam::${process.env.ACCOUNT_ID}:role/${roleName}`;
 
-  constructor(private readonly scheduler = new SchedulerClient()) {
-    //
+  constructor(
+    private readonly scheduler = new SchedulerClient(),
+    private readonly group = scheduleGroup,
+  ) {
+    this.logger.info(`Scheduler will use role ${this.schedulerRoleArn}`);
   }
 
   async addLockSchedules(repoName: string, installationId: number) {
     const unlockCommand = new CreateScheduleCommand({
       Name: `${repoName}-unlock`,
-      GroupName: scheduleGroup,
+      GroupName: this.group,
       ScheduleExpression: `cron(0 8 ? * * *)`,
       FlexibleTimeWindow: { Mode: FlexibleTimeWindowMode.OFF },
       Target: {
@@ -34,14 +37,17 @@ export default class SchedulerService {
         }),
       },
     });
-    this.logger.info(
-      `Adding a unlock schedule named ${unlockCommand.input.Name} to run at ${unlockCommand.input.ScheduleExpression} in group ${scheduleGroup}`,
-    );
+    {
+      const { Name, ScheduleExpression: Crontab } = unlockCommand.input;
+      this.logger.info(
+        `Adding a unlock schedule named ${Name} to run at ${Crontab} in group ${this.group}`,
+      );
+    }
     await this.scheduler.send(unlockCommand);
 
     const lockCommand = new CreateScheduleCommand({
       Name: `${repoName}-lock`,
-      GroupName: scheduleGroup,
+      GroupName: this.group,
       ScheduleExpression: `cron(0 16 ? * * *)`,
       FlexibleTimeWindow: { Mode: FlexibleTimeWindowMode.OFF },
       Target: {
@@ -54,16 +60,19 @@ export default class SchedulerService {
       },
     });
 
-    this.logger.info(
-      `Adding a lock schedule named ${lockCommand.input.Name} to run at ${lockCommand.input.ScheduleExpression} in group ${scheduleGroup}`,
-    );
+    {
+      const { Name, ScheduleExpression: Crontab } = lockCommand.input;
+      this.logger.info(
+        `Adding a lock schedule named ${Name} to run at ${Crontab} in group ${this.group}`,
+      );
+    }
     await this.scheduler.send(lockCommand);
   }
 
   async deleteSchedules(repoName: string) {
     const schedules: ListSchedulesCommandOutput = await this.scheduler.send(
       new ListSchedulesCommand({
-        GroupName: scheduleGroup,
+        GroupName: this.group,
         NamePrefix: repoName,
         MaxResults: 100,
       }),
@@ -71,12 +80,12 @@ export default class SchedulerService {
 
     for (const schedule of schedules.Schedules || []) {
       this.logger.info(
-        `Deleting all schedules named ${schedule.Name}* in group ${scheduleGroup}`,
+        `Deleting all schedules named ${schedule.Name}* in group ${this.group}`,
       );
       await this.scheduler.send(
         new DeleteScheduleCommand({
           Name: schedule.Name,
-          GroupName: scheduleGroup,
+          GroupName: this.group,
         }),
       );
     }
