@@ -33,33 +33,7 @@ Any existing branch protection rules (even on the same branch) are not affected.
 
 Alternatively, you can deploy your own instance of [Probot App Name] by following these steps:
 
-````shell
-# Clone the repository
-git clone [repository URL]
-cd [repository name]
 
-# Install dependencies
-npm install
-
-# Run the bot
-npm start
-
-
-## Features
-
-- **Feature 1:** Description of feature 1.
-- **Feature 2:** Description of feature 2.
-- **Feature 3:** Description of feature 3.
-
-## Configuration
-
-Explain how users can configure your Probot app. This might include creating a `.github/[probot-app-name].yml` file in their repository and specifying configuration options.
-
-```yml
-# .github/[probot-app-name].yml
-option1: value
-option2: value
-````
 
 ## Usage
 

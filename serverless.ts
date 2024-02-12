@@ -22,6 +22,24 @@ const serverlessConfiguration: AWS = {
         statements: [
           {
             Effect: 'Allow',
+            Action: [
+              "iam:GetRole",
+              "iam:PassRole"
+            ],
+            Resource: {
+              'Fn::Join': [
+                ':',
+                [
+                  'arn:aws:iam',
+                  '',
+                  { Ref: 'AWS::AccountId' },
+                  'role/RailcrossSchedulerRole',
+                ],
+              ],
+            },
+          },
+          {
+            Effect: 'Allow',
             Action: 'scheduler:CreateSchedule',
             Resource: {
               'Fn::Join': [
