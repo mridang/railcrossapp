@@ -24,7 +24,7 @@ export default class SchedulerService {
 
   async addLockSchedules(repoName: string, installationId: number) {
     const unlockCommand = new CreateScheduleCommand({
-      Name: `${repoName}-unlock`,
+      Name: `${repoName}-unlock`.replace(/[^0-9a-zA-Z-_.]/g, '--'),
       GroupName: this.group,
       ScheduleExpression: `cron(0 8 ? * * *)`,
       FlexibleTimeWindow: { Mode: FlexibleTimeWindowMode.OFF },
@@ -46,7 +46,7 @@ export default class SchedulerService {
     await this.scheduler.send(unlockCommand);
 
     const lockCommand = new CreateScheduleCommand({
-      Name: `${repoName}-lock`,
+      Name: `${repoName}-lock`.replace(/[^0-9a-zA-Z-_.]/g, '--'),
       GroupName: this.group,
       ScheduleExpression: `cron(0 16 ? * * *)`,
       FlexibleTimeWindow: { Mode: FlexibleTimeWindowMode.OFF },
@@ -73,7 +73,7 @@ export default class SchedulerService {
     const schedules: ListSchedulesCommandOutput = await this.scheduler.send(
       new ListSchedulesCommand({
         GroupName: this.group,
-        NamePrefix: repoName,
+        NamePrefix: repoName.replace(/[^0-9a-zA-Z-_.]/g, '--'),
         MaxResults: 100,
       }),
     );
