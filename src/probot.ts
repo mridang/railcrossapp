@@ -55,4 +55,19 @@ export default (app: Probot) => {
       );
     }
   });
+
+  app.on('installation.deleted', async (context) => {
+    const { id, account } = context.payload.installation;
+    logger.info(`Some repositories removed on @${account.login}`);
+
+    for (const repo of context.payload?.repositories || []) {
+      logger.info(`Uninstalling schedules and rules for ${repo.full_name}`)
+      await schedulerService.deleteSchedules(repo.full_name);
+      await railcrossService.toggleProtection(
+          repo.full_name,
+          context.octokit as any,
+          false,
+      );
+    }
+  });
 };
