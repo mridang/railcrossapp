@@ -1,5 +1,4 @@
 import { getSecret } from './utils';
-import { EventBridgeEvent } from 'aws-lambda';
 
 import { Octokit } from '@octokit/rest';
 
@@ -12,18 +11,18 @@ const logger = pino({
   level: 'info',
 });
 
-exports.lock = async (event: EventBridgeEvent<string, any>) => {
-  console.log(event);
-  const { repo_name, installation_id } = JSON.parse(event.detail) as {
-    repo_name: string;
-    installation_id: number;
-  };
-
+exports.unlock = async ({installation_id, repo_name}: {
+  repo_name: string;
+  installation_id: number;
+}) => {
   logger.info(`Locking repository ${repo_name}`);
+  const secret = await getSecret('LockdownAppConfig');
   const octokit = new Octokit({
     authStrategy: createAppAuth,
     auth: {
-      ...(await getSecret('LockdownAppConfig')),
+      appId: secret.APP_ID,
+      privateKey: secret.PRIVATE_KEY.replaceAll('&', '\n'),
+      secret: secret.WEBHOOK_SECRET,
       installationId: installation_id,
     },
   });
@@ -31,25 +30,22 @@ exports.lock = async (event: EventBridgeEvent<string, any>) => {
   await railcrossService.toggleProtection(installation_id, octokit, true);
 };
 
-exports.unlock = async (event: EventBridgeEvent<string, any>) => {
-  console.log(event);
-  const { repo_name, installation_id } = JSON.parse(event.detail) as {
-    repo_name: string;
-    installation_id: number;
-  };
+exports.unlock = async ({installation_id, repo_name}: {
+  repo_name: string;
+  installation_id: number;
+}) => {
 
   logger.info(`Unlocking repository ${repo_name}`);
+  const secret = await getSecret('LockdownAppConfig');
   const octokit = new Octokit({
     authStrategy: createAppAuth,
     auth: {
-      ...(await getSecret('LockdownAppConfig')),
+      appId: secret.APP_ID,
+      privateKey: secret.PRIVATE_KEY.replaceAll('&', '\n'),
+      secret: secret.WEBHOOK_SECRET,
       installationId: installation_id,
     },
   });
 
-  await railcrossService.toggleProtection(
-    installation_id,
-    octokit as any,
-    false,
-  );
+  await railcrossService.toggleProtection(installation_id, octokit, false,);
 };

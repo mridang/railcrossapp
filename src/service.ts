@@ -118,7 +118,7 @@ export default class Service {
           owner: owner,
           repo: repository.name,
           branch: repository.default_branch,
-          lock_branch: true,
+          lock_branch: lockState,
         });
       } catch (error) {
         Service.logger.info(

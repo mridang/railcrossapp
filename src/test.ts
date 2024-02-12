@@ -11,20 +11,17 @@ export const handler: APIGatewayProxyHandler = async (event, context) => {
   };
 };
 
-
-getSecret('LockdownAppConfig')
-    .then(dd => {
-        console.log(dd.PRIVATE_KEY.replaceAll('&', '\n'))
-    });
+getSecret('LockdownAppConfig').then((dd) => {
+  console.log(dd.PRIVATE_KEY.replaceAll('&', '\n'));
+});
 
 const probot = createProbot({
-    overrides: {
-        appId: "22444242",
-        privateKey: "secret.PRIVATE_KEY",
-        secret: "secret.WEBHOOK_SECRET"
-    },
-})
-probot.load(app)
-    .then(fff => {
-        console.log(fff)
-    })
+  overrides: {
+    appId: '22444242',
+    privateKey: 'secret.PRIVATE_KEY',
+    secret: 'secret.WEBHOOK_SECRET',
+  },
+});
+probot.load(app).then((fff) => {
+  console.log(fff);
+});

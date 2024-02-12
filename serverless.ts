@@ -20,11 +20,6 @@ const serverlessConfiguration: AWS = {
         statements: [
           {
             Effect: 'Allow',
-            Action: 'lambda:InvokeFunction',
-            Resource: '*',
-          },
-          {
-            Effect: 'Allow',
             Action: 'scheduler:CreateSchedule',
             Resource: {
               'Fn::Join': [
@@ -60,6 +55,39 @@ const serverlessConfiguration: AWS = {
   },
   resources: {
     Resources: {
+      RailcrossSchedulerRole: {
+        Type: 'AWS::IAM::Role',
+        Properties: {
+          RoleName: 'RailcrossSchedulerRole',
+          AssumeRolePolicyDocument: {
+            Version: '2012-10-17',
+            Statement: [
+              {
+                Effect: 'Allow',
+                Principal: {
+                  Service: 'scheduler.amazonaws.com',
+                },
+                Action: 'sts:AssumeRole',
+              },
+            ],
+          },
+          Policies: [
+            {
+              PolicyName: 'LambdaInvokePolicy',
+              PolicyDocument: {
+                Version: '2012-10-17',
+                Statement: [
+                  {
+                    Effect: 'Allow',
+                    Action: 'lambda:InvokeFunction',
+                    Resource: '*',
+                  },
+                ],
+              },
+            },
+          ],
+        },
+      },
       RailcrossScheduleGroup: {
         Type: 'AWS::Scheduler::ScheduleGroup',
         Properties: {
