@@ -1,6 +1,7 @@
 import type { AWS } from '@serverless/typescript';
 import packageJson from './package.json';
 import { AwsLambdaRuntime } from '@serverless/typescript';
+import { roleName, scheduleGroup, secretName } from './src/constants';
 
 const serverlessConfiguration: AWS = {
   service: packageJson.name,
@@ -12,6 +13,8 @@ const serverlessConfiguration: AWS = {
   provider: {
     environment: {
       NODE_OPTIONS: '--enable-source-maps',
+      ACCOUNT_ID: '${aws:accountId}',
+      AWS_REGION: '${aws:region}',
     },
     name: 'aws',
     runtime: `nodejs${packageJson.engines.node}` as AwsLambdaRuntime,
@@ -58,7 +61,7 @@ const serverlessConfiguration: AWS = {
       RailcrossSchedulerRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
-          RoleName: 'RailcrossSchedulerRole',
+          RoleName: roleName,
           AssumeRolePolicyDocument: {
             Version: '2012-10-17',
             Statement: [
@@ -91,13 +94,13 @@ const serverlessConfiguration: AWS = {
       RailcrossScheduleGroup: {
         Type: 'AWS::Scheduler::ScheduleGroup',
         Properties: {
-          Name: 'railcross-lock-unlock-schedules',
+          Name: scheduleGroup,
         },
       },
       MySecretsManagerSecret: {
         Type: 'AWS::SecretsManager::Secret',
         Properties: {
-          Name: 'LockdownAppConfig',
+          Name: secretName,
           Description: 'Secrets for my Github application',
           SecretString: JSON.stringify({
             APP_ID: '823576',

@@ -4,9 +4,10 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import lowercaseKeys from 'lowercase-keys';
 import { EmitterWebhookEventName } from '@octokit/webhooks/dist-types/types';
 import app from './probot';
+import { secretName } from './constants';
 
 export const handler: APIGatewayProxyHandler = async (event) => {
-  const secret = await getSecret('LockdownAppConfig');
+  const secret = await getSecret(secretName);
 
   const probot = createProbot({
     overrides: {

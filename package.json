@@ -17,6 +17,7 @@
     "serverless": "serverless"
   },
   "dependencies": {
+    "@aws-sdk/client-scheduler": "^3.511.0",
     "@aws-sdk/client-secrets-manager": "^3.511.0",
     "@octokit/core": "^5.1.0",
     "@octokit/plugin-rest-endpoint-methods": "^10.2.0",

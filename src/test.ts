@@ -2,26 +2,27 @@ import { APIGatewayProxyHandler } from 'aws-lambda';
 import { getSecret } from './utils';
 import { createProbot } from 'probot';
 import app from './probot';
+import {
+  CreateScheduleCommand,
+  FlexibleTimeWindowMode,
+  SchedulerClient,
+} from '@aws-sdk/client-scheduler';
+import { roleName, scheduleGroup } from './constants';
 
-export const handler: APIGatewayProxyHandler = async (event, context) => {
-  const secret = await getSecret('LockdownAppConfig');
-  return {
-    statusCode: 200,
-    body: secret,
-  };
-};
+const scheduler = new SchedulerClient();
 
-getSecret('LockdownAppConfig').then((dd) => {
-  console.log(dd.PRIVATE_KEY.replaceAll('&', '\n'));
-});
-
-const probot = createProbot({
-  overrides: {
-    appId: '22444242',
-    privateKey: 'secret.PRIVATE_KEY',
-    secret: 'secret.WEBHOOK_SECRET',
+const command = new CreateScheduleCommand({
+  Name: 'newScheduler',
+  GroupName: scheduleGroup,
+  ScheduleExpression: `cron(0 8 ? * * *)`,
+  FlexibleTimeWindow: { Mode: FlexibleTimeWindowMode.OFF },
+  Target: {
+    Arn: `arn:aws:lambda:${process.env.AWS_REGION}:${process.env.ACCOUNT_ID}:function:lockdown-dev-unlocker`,
+    RoleArn: `arn:aws:iam::${process.env.ACCOUNT_ID}:role/${roleName}`,
+    Input: JSON.stringify({
+      endDate: 'bar',
+    }),
   },
 });
-probot.load(app).then((fff) => {
-  console.log(fff);
-});
+
+scheduler.send(command);

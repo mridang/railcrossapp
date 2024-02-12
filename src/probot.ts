@@ -1,47 +1,55 @@
 import { Probot } from 'probot';
 import pino from 'pino';
-import Service from './service';
+import ProtectionService from './protection.service';
+import SchedulerService from './scheduler.service';
 
 const logger = pino({
   level: 'info',
 });
 
-const railcrossService = new Service();
+const railcrossService = new ProtectionService();
+const schedulerService = new SchedulerService();
 
 export default (app: Probot) => {
   app.on('installation.created', async (context) => {
-    const { installation } = context.payload;
-    const accountLogin = installation.account.login;
-    logger.info(`New app installation for @${accountLogin}`);
+    const { id, account } = context.payload.installation;
+    logger.info(`New app installation for @${account.login}`);
 
-    await railcrossService.toggleProtection(
-      installation.id,
-      context.octokit as any,
-      true,
-    );
+    for (const repo of context.payload?.repositories || []) {
+      await schedulerService.addLockSchedules(repo.full_name, id);
+      await railcrossService.toggleProtection(
+        repo.full_name,
+        context.octokit as any,
+        true,
+      );
+    }
   });
 
   app.on('installation_repositories.added', async (context) => {
-    const { installation } = context.payload;
-    const accountLogin = installation.account.login;
-    logger.info(`Some repositories added on @${accountLogin}`);
+    const { id, account } = context.payload.installation;
+    logger.info(`Some repositories added on @${account.login}`);
 
-    await railcrossService.toggleProtection(
-      installation.id,
-      context.octokit as any,
-      true,
-    );
+    for (const repo of context.payload?.repositories_added || []) {
+      await schedulerService.addLockSchedules(repo.full_name, id);
+      await railcrossService.toggleProtection(
+        repo.full_name,
+        context.octokit as any,
+        true,
+      );
+    }
   });
 
   app.on('installation_repositories.removed', async (context) => {
-    const { installation } = context.payload;
-    const accountLogin = installation.account.login;
-    logger.info(`Some repositories removed on @${accountLogin}`);
+    const { id, account } = context.payload.installation;
+    logger.info(`Some repositories removed on @${account.login}`);
 
-    await railcrossService.toggleProtection(
-      installation.id,
-      context.octokit as any,
-      true,
-    );
+    for (const repo of context.payload?.repositories_removed || []) {
+      await schedulerService.addLockSchedules(repo.full_name, id);
+      await railcrossService.toggleProtection(
+        repo.full_name,
+        context.octokit as any,
+        false,
+      );
+    }
   });
 };

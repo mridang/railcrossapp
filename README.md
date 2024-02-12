@@ -1,18 +1,17 @@
-
 # Railcross for GitHub
 
 > A brief description of what your Probot app does.
 
-Railcross prevents your teams from merging pull requests outside 
+Railcross prevents your teams from merging pull requests outside
 merge windows.
-Merge windows allow you to restrict the days and 
+Merge windows allow you to restrict the days and
 times that pull requests may be merged.
 
-Think of it as a railway crossing, you can't cross until the 
+Think of it as a railway crossing, you can't cross until the
 train has passed. 🚂
 
-Railcross is a low-overhead app and simply prevents your team 
-from merging between 0900 and 1600. It does this by locking the 
+Railcross is a low-overhead app and simply prevents your team
+from merging between 0900 and 1600. It does this by locking the
 branch protection rule of your default branch.
 Any existing branch protection rules (even on the same branch) are not affected.
 
@@ -34,7 +33,7 @@ Any existing branch protection rules (even on the same branch) are not affected.
 
 Alternatively, you can deploy your own instance of [Probot App Name] by following these steps:
 
-```shell
+````shell
 # Clone the repository
 git clone [repository URL]
 cd [repository name]
@@ -60,7 +59,7 @@ Explain how users can configure your Probot app. This might include creating a `
 # .github/[probot-app-name].yml
 option1: value
 option2: value
-```
+````
 
 ## Usage
 
@@ -75,16 +74,16 @@ After checking out the repository, run `npm install` to install all
 the required dependencies.
 
 In order to develop the application, you must have a GitHub app of
-your own. 
+your own.
 
 ### Linting the code
 
-Lint the code using `npm run lint`. This command runs ESLint and 
+Lint the code using `npm run lint`. This command runs ESLint and
 lints all the files.
 
 ### Formatting the code
 
-Reformat the code using `npm run format`. This runs Prettier and 
+Reformat the code using `npm run format`. This runs Prettier and
 reformats all the code.
 
 ### Deploying the app
@@ -100,8 +99,8 @@ Run the test suite using `npm run test`
 
 ## Contributing
 
-If you have suggestions for how Railcross could be improved, or 
-want to report a bug, open an issue - we'd love all and any 
+If you have suggestions for how Railcross could be improved, or
+want to report a bug, open an issue - we'd love all and any
 contributions.
 
 For more, check out the [Contributing Guide](CONTRIBUTING.md).
