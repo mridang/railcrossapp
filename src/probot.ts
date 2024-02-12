@@ -16,6 +16,7 @@ export default (app: Probot) => {
     logger.info(`New app installation for @${account.login}`);
 
     for (const repo of context.payload?.repositories || []) {
+      logger.info(`Configuring schedules and rules for ${repo.full_name}`)
       await schedulerService.addLockSchedules(repo.full_name, id);
       await railcrossService.toggleProtection(
         repo.full_name,
@@ -30,6 +31,7 @@ export default (app: Probot) => {
     logger.info(`Some repositories added on @${account.login}`);
 
     for (const repo of context.payload?.repositories_added || []) {
+      logger.info(`Adding schedules and rules for ${repo.full_name}`)
       await schedulerService.addLockSchedules(repo.full_name, id);
       await railcrossService.toggleProtection(
         repo.full_name,
@@ -44,6 +46,7 @@ export default (app: Probot) => {
     logger.info(`Some repositories removed on @${account.login}`);
 
     for (const repo of context.payload?.repositories_removed || []) {
+      logger.info(`Removing schedules and rules for ${repo.full_name}`)
       await schedulerService.deleteSchedules(repo.full_name);
       await railcrossService.toggleProtection(
         repo.full_name,

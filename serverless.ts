@@ -14,7 +14,6 @@ const serverlessConfiguration: AWS = {
     environment: {
       NODE_OPTIONS: '--enable-source-maps',
       ACCOUNT_ID: '${aws:accountId}',
-      AWS_REGION: '${aws:region}',
     },
     name: 'aws',
     runtime: `nodejs${packageJson.engines.node}` as AwsLambdaRuntime,
