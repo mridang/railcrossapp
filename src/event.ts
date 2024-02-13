@@ -12,7 +12,7 @@ const logger = pino({
   level: 'info',
 });
 
-exports.unlock = async ({
+exports.lock = async ({
   installation_id,
   repo_name,
 }: {
