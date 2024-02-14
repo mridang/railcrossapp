@@ -33,8 +33,6 @@ Any existing branch protection rules (even on the same branch) are not affected.
 
 Alternatively, you can deploy your own instance of [Probot App Name] by following these steps:
 
-
-
 ## Usage
 
 Provide examples on how the app can be used, including any commands it listens to, any tags it responds to, or any other actions it can perform.
