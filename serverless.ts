@@ -22,10 +22,7 @@ const serverlessConfiguration: AWS = {
         statements: [
           {
             Effect: 'Allow',
-            Action: [
-              "iam:GetRole",
-              "iam:PassRole"
-            ],
+            Action: ['iam:GetRole', 'iam:PassRole'],
             Resource: {
               'Fn::Join': [
                 ':',
