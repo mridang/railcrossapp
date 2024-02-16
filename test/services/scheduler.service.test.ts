@@ -1,6 +1,5 @@
-import {APIGatewayProxyEvent} from "aws-lambda";
-import SchedulerService from "../../dist/src/services/scheduler.service";
-import {ListSchedulesCommand, SchedulerClient} from "@aws-sdk/client-scheduler";
+import {SchedulerClient} from "@aws-sdk/client-scheduler";
+import SchedulerService from "../../src/services/scheduler.service";
 
 describe("scheduler.service test", () => {
 

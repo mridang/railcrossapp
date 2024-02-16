@@ -1,5 +1,5 @@
-import ProtectionService from "../../dist/src/services/protection.service";
 import {Octokit} from "@octokit/rest";
+import ProtectionService from "../../src/services/protection.service";
 
 describe("protection.service test", () => {
 

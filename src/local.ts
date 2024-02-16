@@ -1,4 +1,4 @@
-import { run } from 'probot';
+import {run} from 'probot';
 import app from './probot';
 
 run(app, {

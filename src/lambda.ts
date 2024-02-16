@@ -1,10 +1,10 @@
-import { createProbot } from 'probot';
-import { getSecret } from './utils';
-import { APIGatewayProxyHandler } from 'aws-lambda';
+import {createProbot} from 'probot';
+import {getSecret} from './utils';
+import {APIGatewayProxyHandler} from 'aws-lambda';
 import lowercaseKeys from 'lowercase-keys';
-import { EmitterWebhookEventName } from '@octokit/webhooks/dist-types/types';
+import {EmitterWebhookEventName} from '@octokit/webhooks/dist-types/types';
 import app from './probot';
-import { secretName } from './constants';
+import {secretName} from './constants';
 
 export const handler: APIGatewayProxyHandler = async (event) => {
   const secret = await getSecret(secretName);

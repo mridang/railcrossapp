@@ -1,7 +1,7 @@
-import { Probot } from 'probot';
+import {Probot} from 'probot';
 import pino from 'pino';
-import ProtectionService from './protection.service';
-import SchedulerService from './scheduler.service';
+import ProtectionService from "./services/protection.service";
+import SchedulerService from "./services/scheduler.service";
 
 const logger = pino({
   level: 'info',

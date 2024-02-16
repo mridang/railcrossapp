@@ -1,11 +1,11 @@
-import { getSecret } from './utils';
+import {getSecret} from './utils';
 
-import { Octokit } from '@octokit/rest';
+import {Octokit} from '@octokit/rest';
 
-import { createAppAuth } from '@octokit/auth-app';
-import ProtectionService from './protection.service';
+import {createAppAuth} from '@octokit/auth-app';
 import pino from 'pino';
-import { secretName } from './constants';
+import {secretName} from './constants';
+import ProtectionService from "./services/protection.service";
 
 const railcrossService = new ProtectionService();
 const logger = pino({

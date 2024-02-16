@@ -1,6 +1,6 @@
-import { RestEndpointMethods } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/method-types';
-import { Api } from '@octokit/plugin-rest-endpoint-methods/dist-types/types';
-import { Octokit } from '@octokit/rest';
+import {RestEndpointMethods} from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/method-types';
+import {Api} from '@octokit/plugin-rest-endpoint-methods/dist-types/types';
+import {Octokit} from '@octokit/rest';
 import pino from 'pino';
 
 export default class ProtectionService {
@@ -136,5 +136,11 @@ export default class ProtectionService {
     ProtectionService.logger.info(
       `The ${repository.default_branch} has been locked.`,
     );
+
+    return (await octokit.repos.getBranchProtection({
+      owner,
+      repo: repository.name,
+      branch: repository.default_branch,
+    })).data
   }
 }

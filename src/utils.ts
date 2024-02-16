@@ -1,8 +1,4 @@
-import {
-  SecretsManagerClient,
-  GetSecretValueCommand,
-  GetSecretValueResponse,
-} from '@aws-sdk/client-secrets-manager';
+import {GetSecretValueCommand, GetSecretValueResponse, SecretsManagerClient,} from '@aws-sdk/client-secrets-manager';
 
 const client = new SecretsManagerClient();
 const decoder = new TextDecoder('utf8');
