@@ -4,13 +4,11 @@ services:
   localstack:
     image: localstack/localstack:latest
     ports:
-      - "4566:4566" # LocalStack exposes services on 4566 by default
-      - "4571:4571" # Legacy port for DynamoDB, optional
+      - "4566:4566"
     environment:
-      - SERVICES=dynamodb
+      - DEBUG=1
       - DEFAULT_REGION=us-east-1
       - EDGE_PORT=4566
-      - DATA_DIR=/tmp/localstack/data # Enables data persistence
+      - DATA_DIR=/tmp/localstack/data
     volumes:
-      - "./localstack:/tmp/localstack" # Mount local directory for persistence
       - "/var/run/docker.sock:/var/run/docker.sock" # Docker daemon socket (optional)
