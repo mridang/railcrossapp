@@ -9,9 +9,10 @@ import {SchedulerClient} from "@aws-sdk/client-scheduler";
 import GithubConfig from "./github.config";
 import {Octokit} from "@octokit/rest";
 import {createAppAuth} from "@octokit/auth-app";
+import {SetupController} from "./setup.controller";
 
 @Module({
-    controllers: [WebhookController],
+    controllers: [WebhookController, SetupController],
     providers: [
         ProtectionService,
         SchedulerService,
