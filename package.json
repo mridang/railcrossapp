@@ -17,17 +17,22 @@
     "serverless": "serverless"
   },
   "dependencies": {
+    "@aws-lambda-powertools/logger": "^1.18.0",
     "@aws-sdk/client-scheduler": "^3.511.0",
     "@aws-sdk/client-secrets-manager": "^3.511.0",
+    "@codegenie/serverless-express": "^4.3.0",
+    "@nestjs/common": "^10.0.0",
+    "@nestjs/config": "^3.1.1",
+    "@nestjs/core": "^10.0.0",
+    "@nestjs/cqrs": "^10.2.6",
+    "@nestjs/platform-express": "^10.0.0",
     "@octokit/core": "^5.1.0",
     "@octokit/plugin-rest-endpoint-methods": "^10.2.0",
     "@octokit/rest": "^20.0.2",
-    "@probot/adapter-aws-lambda-serverless": "^3.0.4",
-    "install": "^0.13.0",
-    "pino": "^8.18.0",
+    "@slack/bolt": "^3.16.0",
+    "express-handlebars": "^7.1.2",
     "probot": "^12.3.3",
-    "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.8.1"
+    "reflect-metadata": "^0.1.13"
   },
   "engines": {
     "node": "20.x"
@@ -37,13 +42,11 @@
   },
   "devDependencies": {
     "@serverless/typescript": "^3.38.0",
-    "@swc/cli": "^0.1.62",
-    "@swc/core": "^1.3.64",
     "@tsconfig/node20": "latest",
     "@types/aws-lambda": "^8.10.133",
+    "@types/express": "^4.17.21",
     "@types/jest": "^29.5.11",
     "@types/node": "^20.3.2",
-    "@types/pino": "^7.0.5",
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
     "@typescript-eslint/parser": "^5.0.0",
@@ -59,9 +62,7 @@
     "eslint-plugin-promise": "^6.1.1",
     "jest": "^29.7.0",
     "localtunnel": "^2.0.2",
-    "nock": "^13.4.0",
     "npm": "^9.9.2",
-    "npm-run-all": "^4.1.5",
     "prettier": "^3.1.1",
     "serverless": "^3.38.0",
     "serverless-localstack": "^1.1.1",

@@ -1,57 +1,27 @@
-import {getSecret} from './utils';
-
-import {Octokit} from '@octokit/rest';
-
-import {createAppAuth} from '@octokit/auth-app';
-import pino from 'pino';
-import {secretName} from './constants';
-import ProtectionService from "./services/protection.service";
-
-const railcrossService = new ProtectionService();
-const logger = pino({
-  level: 'info',
-});
+import ProtectionService from './services/lockdown/protection.service';
+import {NestFactory} from "@nestjs/core";
+import {AppModule} from "./app.module";
 
 exports.lock = async ({
-  installation_id,
-  repo_name,
-}: {
-  repo_name: string;
-  installation_id: number;
+                          installation_id,
+                          repo_name,
+                      }: {
+    repo_name: string;
+    installation_id: number;
 }) => {
-  logger.info(`Locking repository ${repo_name}`);
-  const secret = await getSecret(secretName);
-  const octokit = new Octokit({
-    authStrategy: createAppAuth,
-    auth: {
-      appId: secret.APP_ID,
-      privateKey: secret.PRIVATE_KEY.replaceAll('&', '\n'),
-      secret: secret.WEBHOOK_SECRET,
-      installationId: installation_id,
-    },
-  });
-
-  await railcrossService.toggleProtection(repo_name, octokit, true);
+    const app = await NestFactory.createApplicationContext(AppModule);
+    const protectionService = app.get(ProtectionService);
+    await protectionService.toggleProtection(repo_name, installation_id, true);
 };
 
 exports.unlock = async ({
-  installation_id,
-  repo_name,
-}: {
-  repo_name: string;
-  installation_id: number;
+                            installation_id,
+                            repo_name,
+                        }: {
+    repo_name: string;
+    installation_id: number;
 }) => {
-  logger.info(`Unlocking repository ${repo_name}`);
-  const secret = await getSecret(secretName);
-  const octokit = new Octokit({
-    authStrategy: createAppAuth,
-    auth: {
-      appId: secret.APP_ID,
-      privateKey: secret.PRIVATE_KEY.replaceAll('&', '\n'),
-      secret: secret.WEBHOOK_SECRET,
-      installationId: installation_id,
-    },
-  });
-
-  await railcrossService.toggleProtection(repo_name, octokit, false);
+    const app = await NestFactory.createApplicationContext(AppModule);
+    const protectionService = app.get(ProtectionService);
+    await protectionService.toggleProtection(repo_name, installation_id, false);
 };

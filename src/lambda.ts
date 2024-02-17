@@ -1,67 +1,75 @@
-import {createProbot} from 'probot';
-import {getSecret} from './utils';
-import {APIGatewayProxyHandler} from 'aws-lambda';
-import lowercaseKeys from 'lowercase-keys';
-import {EmitterWebhookEventName} from '@octokit/webhooks/dist-types/types';
-import app from './probot';
-import {secretName} from './constants';
+import {NestFactory} from '@nestjs/core';
+import {ExpressAdapter} from '@nestjs/platform-express';
+import serverlessExpress from '@codegenie/serverless-express';
+import {Context, Handler} from 'aws-lambda';
+import express from 'express';
 
-export const handler: APIGatewayProxyHandler = async (event) => {
-  const secret = await getSecret(secretName);
+import {AppModule} from './app.module';
 
-  const probot = createProbot({
-    overrides: {
-      appId: secret.APP_ID,
-      privateKey: secret.PRIVATE_KEY.replaceAll('&', '\n'),
-      secret: secret.WEBHOOK_SECRET,
-    },
-  });
-  await probot.load(app);
+import {LoggerService} from '@nestjs/common';
+import {Logger} from '@aws-lambda-powertools/logger';
 
-  const headers = lowercaseKeys(event.headers);
+class PowertoolsLoggerService implements LoggerService {
+    private logger: Logger;
 
-  const id = headers['x-github-delivery'];
-  if (id !== undefined) {
-    const name = headers['x-github-event'];
-    if (name !== undefined) {
-      const signature =
-        headers['x-hub-signature-256'] || headers['x-hub-signature'];
-      if (signature !== undefined) {
-        const payload = event.body;
-        if (payload !== null) {
-          await probot.webhooks.verifyAndReceive({
-            id,
-            signature,
-            payload,
-            name: name as EmitterWebhookEventName,
-          });
-
-          return {
-            statusCode: 200,
-            body: JSON.stringify({ ok: true }),
-          };
-        } else {
-          return {
-            statusCode: 400,
-            body: 'Missing webhook request body',
-          };
-        }
-      } else {
-        return {
-          statusCode: 400,
-          body: 'Missing x-github-signature header',
-        };
-      }
-    } else {
-      return {
-        statusCode: 400,
-        body: 'Missing x-github-event header',
-      };
+    constructor() {
+        this.logger = new Logger();
     }
-  } else {
-    return {
-      statusCode: 400,
-      body: 'Missing x-github-delivery header',
-    };
-  }
+
+    private formatMessage(message: string | Record<string, any>, context?: string): string {
+        if (typeof message === 'string') {
+            return context ? `${context}: ${message}` : message;
+        } else {
+            return JSON.stringify({ context, ...message });
+        }
+    }
+
+    log(message: string | Record<string, any>, context?: string): void {
+        this.logger.info(this.formatMessage(message, context));
+    }
+
+    error(message: string | Record<string, any>, trace?: string, context?: string): void {
+        this.logger.error(this.formatMessage(message, context), { trace });
+    }
+
+    warn(message: string | Record<string, any>, context?: string): void {
+        this.logger.warn(this.formatMessage(message, context));
+    }
+
+    debug(message: string | Record<string, any>, context?: string): void {
+        this.logger.debug(this.formatMessage(message, context));
+    }
+
+    verbose(message: string | Record<string, any>, context?: string): void {
+        this.logger.debug(this.formatMessage(message, context));
+    }
+}
+
+
+let cachedServer: Handler;
+
+async function bootstrap() {
+    if (!cachedServer) {
+        const expressApp = express();
+        const nestApp = await NestFactory.create(
+            AppModule,
+            new ExpressAdapter(expressApp),
+            {
+                logger: new PowertoolsLoggerService()
+            }
+        );
+
+        nestApp.enableCors();
+
+        await nestApp.init();
+
+        cachedServer = serverlessExpress({ app: expressApp });
+    }
+
+    return cachedServer;
+}
+
+export const handler = async (event: any, context: Context, callback: any) => {
+    const server = await bootstrap();
+    return server(event, context, callback);
 };

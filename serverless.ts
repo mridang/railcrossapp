@@ -163,11 +163,6 @@ const serverlessConfiguration: AWS = {
       timeout: 60,
       url: true,
     },
-    test: {
-      handler: 'src/test.handler',
-      timeout: 60,
-      url: true,
-    },
     locker: {
       handler: 'src/event.lock',
       timeout: 60,
