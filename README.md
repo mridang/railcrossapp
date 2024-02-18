@@ -47,11 +47,11 @@ your own.
 Configure the `.env` file with the necessary information. This file has
 be configured with example values.
 
-* `APP_ID` is the unique identifier of your app and is used for authenticating to the GitHub API
-* `CLIENT_ID` is the unique client identifier of your app  and is used for authenticating to the GitHub API
-* `WEBHOOK_SECRET` is the webhook secret of your app and is used for validating the webhook signatures
-* `JEST_GITHUB_PAT` is a personal access token that is used for the integration tests.
-* `JEST_GITHUB_REPO` is the name of a repository that is used for the integration tests.
+- `APP_ID` is the unique identifier of your app and is used for authenticating to the GitHub API
+- `CLIENT_ID` is the unique client identifier of your app and is used for authenticating to the GitHub API
+- `WEBHOOK_SECRET` is the webhook secret of your app and is used for validating the webhook signatures
+- `JEST_GITHUB_PAT` is a personal access token that is used for the integration tests.
+- `JEST_GITHUB_REPO` is the name of a repository that is used for the integration tests.
 
 > [!NOTE]
 > It is fine to add sensitive information to this file as this file only
