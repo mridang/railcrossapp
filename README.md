@@ -40,8 +40,6 @@ Provide examples on how the app can be used, including any commands it listens t
 Railcross is built with Typescript using the NestJS and
 requires Node 20 to run.
 
-
-
 After checking out the repository, run `npm install` to install all
 the required dependencies.
 
@@ -73,7 +71,7 @@ Deploy the app using `npm run deploy`.
 
 > [!IMPORTANT]
 > You'll need to ensure that you have the AWS credentials configured. Read the
-guide on how to configure the variables https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html
+> guide on how to configure the variables https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html
 
 ### Running tests
 
