@@ -119,7 +119,7 @@ your IDE.
 
 ### Running the app
 
-To run the application locally, you can simply run `npx nest start` 
+To run the application locally, you can simply run `npx nest start`
 which starts the NestJS application for local usage.
 
 > [!IMPORTANT]
@@ -129,8 +129,8 @@ which starts the NestJS application for local usage.
 > hard.
 
 Assuming that you have followed the instructions and configured
-everything correctly, you should be able to go to 
-`http://localhost:3000/status` to see a health-check page that 
+everything correctly, you should be able to go to
+`http://localhost:3000/status` to see a health-check page that
 reads "OK". If you've managed to get here, it indicates that the
 application has been able to correctly initialize itself.
 
