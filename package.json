@@ -58,7 +58,7 @@
     "@types/hbs": "^4.0.4",
     "@types/jest": "^29.5.11",
     "@types/node": "^20.3.2",
-    "@types/supertest": "^2.0.12",
+    "@types/supertest": "^6.0.2",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "@typescript-eslint/typescript-estree": "^7.0.0",
