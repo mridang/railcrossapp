@@ -33,8 +33,6 @@ Alternatively, you can deploy your own instance of [Probot App Name] by followin
 
 ## Usage
 
-Provide examples on how the app can be used, including any commands it listens to, any tags it responds to, or any other actions it can perform.
-
 ## Developing
 
 Railcross is built with Typescript using the NestJS and
@@ -53,7 +51,7 @@ lints all the files. To automatically fix any fixable lint errors, run
 `npm run lint:fix`.
 
 > [!NOTE]
-> Github Actions has been configured to automatically fix all fixable
+> GitHub Actions has been configured to automatically fix all fixable
 > lint errors on every commit and commit the changes back to the branch.
 
 ### Formatting the code
@@ -71,13 +69,28 @@ Deploy the app using `npm run deploy`.
 
 > [!IMPORTANT]
 > You'll need to ensure that you have the AWS credentials configured. Read the
-> guide on how to configure the variables https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html
+guide on how to configure the variables https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html
 
 ### Running tests
 
 Run the test suite using `npm run test`. Most tests are designed to use
 Localstack when possible. Jest automatically starts the containers defined
 in `docker-compose.yml`.
+
+> [!IMPORTANT]
+> Some tests run against the GitHub API and require both a token and a 
+> test repository to be configured. To run all GitHub integration tests,
+> you must create a repository called "<owner>/testing" and create a 
+> personal access token (PAT). Once complete, export them as environment
+> variables.
+> 
+> ```
+> export JEST_GITHUB_REPO=owner/repo
+> export JEST_GITHUB_PAT=github_pat_11AAC
+> ```
+> 
+> On GitHub, these can simply be configured as environment variables
+> https://docs.github.com/en/actions/learn-github-actions/variables
 
 ## Contributing
 
