@@ -6,7 +6,7 @@ describe('protection.service test', () => {
     const protectionService = new ProtectionService(() => {
       return new Octokit({
         auth: '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',
-      })
+      });
     });
 
     expect(
