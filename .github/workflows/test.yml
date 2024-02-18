@@ -35,3 +35,6 @@ jobs:
 
       - name: Run Jest
         run: npm run test
+        env:
+          JEST_GITHUB_REPO: ${{ secrets.JEST_GITHUB_REPO }}
+          JEST_GITHUB_PAT: ${{ secrets.JEST_GITHUB_PAT }}
