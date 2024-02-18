@@ -1,13 +1,23 @@
-import {NestFactory} from '@nestjs/core';
-import {NestExpressApplication} from '@nestjs/platform-express';
+import { NestFactory } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import serverlessExpress from '@codegenie/serverless-express';
-import {APIGatewayProxyEvent, APIGatewayProxyResult, Callback, Context, Handler,} from 'aws-lambda';
-import {AppModule} from './app.module';
-import {BadRequestException, LoggerService, ValidationPipe} from '@nestjs/common';
-import {Logger} from '@aws-lambda-powertools/logger';
-import {join} from 'path';
-import {handlebars} from "hbs";
-import * as fs from "fs";
+import {
+  APIGatewayProxyEvent,
+  APIGatewayProxyResult,
+  Callback,
+  Context,
+  Handler,
+} from 'aws-lambda';
+import { AppModule } from './app.module';
+import {
+  BadRequestException,
+  LoggerService,
+  ValidationPipe,
+} from '@nestjs/common';
+import { Logger } from '@aws-lambda-powertools/logger';
+import { join } from 'path';
+import { handlebars } from 'hbs';
+import * as fs from 'fs';
 
 class PowertoolsLoggerService implements LoggerService {
   private logger: Logger;
@@ -49,39 +59,51 @@ let cachedServer: Handler;
 
 async function bootstrap() {
   if (!cachedServer) {
-    const nestApp = await NestFactory.create<NestExpressApplication>(AppModule, {
-      logger: new PowertoolsLoggerService(),
-    });
+    const nestApp = await NestFactory.create<NestExpressApplication>(
+      AppModule,
+      {
+        logger: new PowertoolsLoggerService(),
+      },
+    );
     nestApp.setViewEngine('hbs');
     nestApp.setBaseViewsDir(join(__dirname, 'views'));
-    nestApp.engine('hbs', (filePath: string, options: Record<string, any>, callback: (err: Error | null, rendered?: string) => void) => {
-      const template = handlebars.compile(fs.readFileSync(filePath, 'utf8'));
-      const result = template(options);
-      callback(null, result);
-    });
+    nestApp.engine(
+      'hbs',
+      (
+        filePath: string,
+        options: Record<string, any>,
+        callback: (err: Error | null, rendered?: string) => void,
+      ) => {
+        const template = handlebars.compile(fs.readFileSync(filePath, 'utf8'));
+        const result = template(options);
+        callback(null, result);
+      },
+    );
 
     nestApp.enableCors();
     nestApp.useGlobalPipes(
-        new ValidationPipe({
-          transform: true,
-          whitelist: true,
-          forbidNonWhitelisted: true,
-          transformOptions: {
-            enableImplicitConversion: true,
-          },
-          exceptionFactory: (errors) => {
-            const messages = errors.map((error) => ({
-              property: error.property,
-              constraints: error.constraints,
-            }));
-            return new BadRequestException(messages);
-          },
-        }),
+      new ValidationPipe({
+        transform: true,
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transformOptions: {
+          enableImplicitConversion: true,
+        },
+        exceptionFactory: (errors) => {
+          const messages = errors.map((error) => ({
+            property: error.property,
+            constraints: error.constraints,
+          }));
+          return new BadRequestException(messages);
+        },
+      }),
     );
 
     await nestApp.init();
 
-    cachedServer = serverlessExpress({ app: nestApp.getHttpAdapter().getInstance() });
+    cachedServer = serverlessExpress({
+      app: nestApp.getHttpAdapter().getInstance(),
+    });
   }
 
   return cachedServer;
