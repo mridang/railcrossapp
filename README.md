@@ -1,7 +1,5 @@
 # Railcross for GitHub
 
-> A brief description of what your Probot app does.
-
 Railcross prevents your teams from merging pull requests outside
 merge windows.
 Merge windows allow you to restrict the days and
@@ -39,30 +37,40 @@ Provide examples on how the app can be used, including any commands it listens t
 
 ## Developing
 
-Railcross is built with Typescript using the Probot framework and
+Railcross is built with Typescript using the NestJS and
 requires Node 20 to run.
 
 After checking out the repository, run `npm install` to install all
 the required dependencies.
 
-In order to develop the application, you must have a GitHub app of
+To develop the application, you must have a GitHub app of
 your own.
 
 ### Linting the code
 
 Lint the code using `npm run lint`. This command runs ESLint and
-lints all the files.
+lints all the files. To automatically fix any fixable lint errors, run
+`npm run lint:fix`.
+
+> [!NOTE]
+> Github Actions has been configured to automatically fix all fixable
+> lint errors on every commit and commit the changes back to the branch.
 
 ### Formatting the code
 
 Reformat the code using `npm run format`. This runs Prettier and
 reformats all the code.
 
+> [!NOTE]
+> Github Actions has been configured to automatically reformat all the
+> code on every commit and commit the changes back to the branch.
+
 ### Deploying the app
 
 Deploy the app using `npm run deploy`.
 
-⚠️You'll need to ensure that you have the AWS credentials configured. Read the
+> [!IMPORTANT]
+> You'll need to ensure that you have the AWS credentials configured. Read the
 guide on how to configure the variables https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html
 
 ### Running tests
