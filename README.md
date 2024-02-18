@@ -35,7 +35,7 @@ Alternatively, you can deploy your own instance of [Probot App Name] by followin
 
 ## Developing
 
-Railcross is built with Typescript using the NestJS and
+Railcross is built with Typescript 5.3 using the NestJS and
 requires Node 20 to run.
 
 After checking out the repository, run `npm install` to install all
@@ -113,6 +113,26 @@ in `docker-compose.yml`.
 >
 > On GitHub, these can simply be configured as environment variables
 > https://docs.github.com/en/actions/learn-github-actions/variables
+
+If configured correctly, you should be able to run all the tests from
+your IDE.
+
+### Running the app
+
+To run the application locally, you can simply run `npx nest start` 
+which starts the NestJS application for local usage.
+
+> [!IMPORTANT]
+> It is important to keep in mind that the way application runs locally
+> is different from how it runs on Lambda. This is due to shortcomings
+> in the Serverless framework that make emulating a Lambda environment
+> hard.
+
+Assuming that you have followed the instructions and configured
+everything correctly, you should be able to go to 
+`http://localhost:3000/status` to see a health-check page that 
+reads "OK". If you've managed to get here, it indicates that the
+application has been able to correctly initialize itself.
 
 ## Contributing
 
