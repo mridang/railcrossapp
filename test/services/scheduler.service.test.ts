@@ -1,5 +1,5 @@
 import { SchedulerClient } from '@aws-sdk/client-scheduler';
-import SchedulerService from '../../src/services/lockdown/scheduler.service';
+import SchedulerService from '../../src/services/railcross/scheduler.service';
 
 describe('scheduler.service test', () => {
   test('that schedules are added"', async () => {
@@ -23,7 +23,7 @@ describe('scheduler.service test', () => {
         Name: 'foo--bar-unlock',
         State: 'ENABLED',
         Target: {
-          Arn: 'arn:aws:lambda:undefined:undefined:function:lockdown-dev-unlocker',
+          Arn: 'arn:aws:lambda:undefined:undefined:function:railcross-dev-unlocker',
         },
         FlexibleTimeWindow: { Mode: 'OFF' },
         ScheduleExpression: 'cron(0 8 ? * * *)',
@@ -35,7 +35,7 @@ describe('scheduler.service test', () => {
         Name: 'foo--bar-lock',
         State: 'ENABLED',
         Target: {
-          Arn: 'arn:aws:lambda:undefined:undefined:function:lockdown-dev-locker',
+          Arn: 'arn:aws:lambda:undefined:undefined:function:railcross-dev-locker',
         },
         FlexibleTimeWindow: { Mode: 'OFF' },
         ScheduleExpression: 'cron(0 16 ? * * *)',
@@ -50,7 +50,7 @@ describe('scheduler.service test', () => {
         GroupName: 'default',
         Name: 'foo--bar-unlock',
         Target: {
-          Arn: 'arn:aws:lambda:undefined:undefined:function:lockdown-dev-unlocker',
+          Arn: 'arn:aws:lambda:undefined:undefined:function:railcross-dev-unlocker',
         },
         FlexibleTimeWindow: { Mode: 'OFF' },
         ScheduleExpression: 'cron(0 6 ? * * *)',
@@ -61,7 +61,7 @@ describe('scheduler.service test', () => {
         GroupName: 'default',
         Name: 'foo--bar-lock',
         Target: {
-          Arn: 'arn:aws:lambda:undefined:undefined:function:lockdown-dev-locker',
+          Arn: 'arn:aws:lambda:undefined:undefined:function:railcross-dev-locker',
         },
         FlexibleTimeWindow: { Mode: 'OFF' },
         ScheduleExpression: 'cron(0 22 ? * * *)',

@@ -1,0 +1,90 @@
+{
+    "name": "lockdown",
+    "version": "0.0.1",
+    "scripts": {
+        "build": "sls package",
+        "deploy": "sls deploy --aws-profile=mridang",
+        "copy-files": "cp -r src/views dist/src/views",
+        "start": "npm run build && npm run copy-files && node dist/src/server.js",
+        "start:slack": "npm run build && node slack.js",
+        "test": "jest --verbose --config=jest.config.js --runInBand",
+        "test:watch": "npm run test -- --watch",
+        "test:debug": "jest --verbose --config=jest.config.js --runInBand --detectOpenHandles",
+        "format": "prettier --write \"**/*.{js,ts,jsx,tsx,json,css,md,html}\"",
+        "format:check": "prettier --check \"**/*.{js,ts,jsx,tsx,json,css,md,html}\"",
+        "lint": "npx eslint --ext .jsx,.js,.tsx,.ts .",
+        "lint:fix": "npx eslint --ext .jsx,.js,.tsx,.ts . --fix",
+        "serverless": "serverless"
+    },
+    "dependencies": {
+        "@aws-lambda-powertools/logger": "^1.18.0",
+        "@aws-sdk/client-scheduler": "^3.511.0",
+        "@aws-sdk/client-secrets-manager": "^3.511.0",
+        "@codegenie/serverless-express": "^4.3.0",
+        "@nestjs/common": "^10.0.0",
+        "@nestjs/config": "^3.1.1",
+        "@nestjs/core": "^10.0.0",
+        "@nestjs/cqrs": "^10.2.6",
+        "@nestjs/platform-express": "^10.0.0",
+        "@nestjs/serve-static": "^4.0.1",
+        "@octokit/core": "^5.1.0",
+        "@octokit/plugin-rest-endpoint-methods": "^10.2.0",
+        "@octokit/rest": "^20.0.2",
+        "@slack/bolt": "^3.16.0",
+        "class-transformer": "^0.5.1",
+        "class-validator": "^0.14.1",
+        "express-handlebars": "^7.1.2",
+        "hbs": "^4.2.0",
+        "probot": "^12.3.3",
+        "reflect-metadata": "^0.1.13"
+    },
+    "engines": {
+        "node": "20.x"
+    },
+    "repository": {
+        "url": "https://github.com/mridang/railcrossapp"
+    },
+    "overrides": {
+        "eslint-config-standard-with-typescript": {
+            "@typescript-eslint/eslint-plugin": "^7.0.0"
+        }
+    },
+    "devDependencies": {
+        "@serverless/typescript": "^3.38.0",
+        "@tsconfig/node20": "latest",
+        "@types/aws-lambda": "^8.10.133",
+        "@types/express": "^4.17.21",
+        "@types/express-handlebars": "^6.0.0",
+        "@types/hbs": "^4.0.4",
+        "@types/jest": "^29.5.11",
+        "@types/node": "^20.3.2",
+        "@types/supertest": "^2.0.12",
+        "@typescript-eslint/eslint-plugin": "^7.0.0",
+        "@typescript-eslint/parser": "^7.0.0",
+        "@typescript-eslint/typescript-estree": "^7.0.0",
+        "eslint": "^8.0.1",
+        "eslint-config-prettier": "^8.3.0",
+        "eslint-config-standard-with-typescript": "^43.0.1",
+        "eslint-plugin-eslint-comments": "^3.2.0",
+        "eslint-plugin-import": "^2.29.1",
+        "eslint-plugin-jest": "^27.6.0",
+        "eslint-plugin-node": "^11.1.0",
+        "eslint-plugin-prettier": "^5.0.0",
+        "eslint-plugin-promise": "^6.1.1",
+        "jest": "^29.7.0",
+        "localtunnel": "^2.0.2",
+        "npm": "^9.9.2",
+        "prettier": "^3.1.1",
+        "serverless": "^3.38.0",
+        "serverless-localstack": "^1.1.1",
+        "serverless-offline": "^12.0.4",
+        "serverless-plugin-typescript": "^2.1.5",
+        "source-map-support": "^0.5.21",
+        "supertest": "^6.3.3",
+        "ts-jest": "^29.1.0",
+        "ts-loader": "^9.4.3",
+        "ts-node": "^10.9.1",
+        "tsconfig-paths": "^4.2.0",
+        "typescript": "^5.1.3"
+    }
+}

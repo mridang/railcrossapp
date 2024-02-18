@@ -42,7 +42,7 @@
     "node": "20.x"
   },
   "repository": {
-    "url": "https://github.com/mridang/lockdown"
+    "url": "https://github.com/mridang/railcrossapp"
   },
   "overrides": {
     "eslint-config-standard-with-typescript": {

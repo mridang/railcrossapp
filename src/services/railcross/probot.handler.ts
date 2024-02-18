@@ -4,7 +4,7 @@ import SchedulerService from './scheduler.service';
 import { Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
-export default class LockdownProbot {
+export default class RailcrossProbot {
   constructor(
     private readonly railcrossService: ProtectionService,
     private readonly schedulerService: SchedulerService,
@@ -16,7 +16,7 @@ export default class LockdownProbot {
     const railcrossService: ProtectionService = this.railcrossService;
     const schedulerService: SchedulerService = this.schedulerService;
     return (app: Probot) => {
-      const logger = new Logger(LockdownProbot.name);
+      const logger = new Logger(RailcrossProbot.name);
 
       app.on('installation.created', async (context) => {
         const { id, account } = context.payload.installation;

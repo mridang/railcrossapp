@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config';
-import { LockdownModule } from './services/lockdown/lockdown.module';
+import { RailcrossModule } from './services/railcross/railcross.module';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
-    LockdownModule,
+    RailcrossModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
     }),

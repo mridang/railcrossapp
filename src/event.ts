@@ -1,4 +1,4 @@
-import ProtectionService from './services/lockdown/protection.service';
+import ProtectionService from './services/railcross/protection.service';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 

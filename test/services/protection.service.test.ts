@@ -1,5 +1,5 @@
 import { Octokit } from '@octokit/rest';
-import ProtectionService from '../../src/services/lockdown/protection.service';
+import ProtectionService from '../../src/services/railcross/protection.service';
 
 describe('protection.service test', () => {
   test('that branches get protected"', async () => {

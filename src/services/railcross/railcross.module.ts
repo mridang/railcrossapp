@@ -4,7 +4,7 @@ import ProtectionService from './protection.service';
 import SchedulerService from './scheduler.service';
 import { roleName, scheduleGroup, secretName } from '../../constants';
 import { createProbot } from 'probot';
-import LockdownProbot from './probot.handler';
+import RailcrossProbot from './probot.handler';
 import { SchedulerClient } from '@aws-sdk/client-scheduler';
 import GithubConfig from './github.config';
 import { Octokit } from '@octokit/rest';
@@ -16,14 +16,14 @@ import { SetupController } from './setup.controller';
   providers: [
     ProtectionService,
     SchedulerService,
-    LockdownProbot,
+    RailcrossProbot,
     GithubConfig,
     {
-      inject: [GithubConfig, LockdownProbot],
+      inject: [GithubConfig, RailcrossProbot],
       provide: 'PROBOT',
       useFactory: async (
         githubConfig: GithubConfig,
-        lockdownProbot: LockdownProbot,
+        railcrossProbot: RailcrossProbot,
       ) => {
         const secret = await githubConfig.getSecret(secretName);
 
@@ -33,7 +33,7 @@ import { SetupController } from './setup.controller';
           },
         });
 
-        await probot.load(lockdownProbot.init());
+        await probot.load(railcrossProbot.init());
 
         return probot;
       },
@@ -78,6 +78,6 @@ import { SetupController } from './setup.controller';
     //
   ],
 })
-export class LockdownModule {
+export class RailcrossModule {
   //
 }
