@@ -69,7 +69,7 @@ Deploy the app using `npm run deploy`.
 
 > [!IMPORTANT]
 > You'll need to ensure that you have the AWS credentials configured. Read the
-guide on how to configure the variables https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html
+> guide on how to configure the variables https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html
 
 ### Running tests
 
@@ -80,23 +80,23 @@ in `docker-compose.yml`.
 > [!NOTE]
 > If you run into any issues while running the tests locally, ensure that
 > no other services are currently listening on the same ports used by the
-> services defined in `docker-compose.yml`. 
+> services defined in `docker-compose.yml`.
 > Run `docker ps` to list all currently running containers. Any containers
-> listening on the required ports should be stopped prior to running the 
+> listening on the required ports should be stopped prior to running the
 > test suite again.
 
 > [!IMPORTANT]
-> Some tests run against the GitHub API and require both a token and a 
+> Some tests run against the GitHub API and require both a token and a
 > test repository to be configured. To run all GitHub integration tests,
-> you must create a repository called "<owner>/testing" and create a 
+> you must create a repository called "<owner>/testing" and create a
 > personal access token (PAT). Once complete, export them as environment
 > variables.
-> 
+>
 > ```
 > export JEST_GITHUB_REPO=owner/repo
 > export JEST_GITHUB_PAT=github_pat_11AAC
 > ```
-> 
+>
 > On GitHub, these can simply be configured as environment variables
 > https://docs.github.com/en/actions/learn-github-actions/variables
 
