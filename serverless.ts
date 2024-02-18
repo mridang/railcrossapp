@@ -91,7 +91,7 @@ const serverlessConfiguration: AWS = {
                   { Ref: 'AWS::Region' },
                   { Ref: 'AWS::AccountId' },
                   'secret',
-                  'LockdownAppConfig-*',
+                  `${secretName}-*`,
                 ],
               ],
             },
