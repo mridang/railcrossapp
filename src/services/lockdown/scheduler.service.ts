@@ -1,13 +1,13 @@
 import {
-  CreateScheduleCommand,
-  DeleteScheduleCommand,
-  FlexibleTimeWindowMode,
-  GetScheduleCommand,
-  ListSchedulesCommand,
-  ListSchedulesCommandOutput,
-  SchedulerClient,
-  ScheduleSummary,
-  UpdateScheduleCommand,
+    CreateScheduleCommand,
+    DeleteScheduleCommand,
+    FlexibleTimeWindowMode,
+    GetScheduleCommand,
+    ListSchedulesCommand,
+    ListSchedulesCommandOutput,
+    SchedulerClient,
+    ScheduleSummary,
+    UpdateScheduleCommand,
 } from '@aws-sdk/client-scheduler';
 import {roleName, scheduleGroup} from '../../constants';
 import {Inject, Injectable, Logger} from '@nestjs/common';
@@ -79,8 +79,8 @@ export default class SchedulerService {
 
     async updateSchedules(
         repoName: string,
-        lockTime: string,
-        unlockTime: string,
+        lockTime: number,
+        unlockTime: number,
         timeZone: string,
     ) {
         const schedules: ListSchedulesCommandOutput = await this.scheduler.send(
@@ -156,7 +156,7 @@ export default class SchedulerService {
             }),
         );
 
-        const dd = await Promise.all(
+        return await Promise.all(
             (schedules.Schedules || []).map(async (schedule) => {
                 return await this.scheduler.send(
                     new GetScheduleCommand({
@@ -165,7 +165,5 @@ export default class SchedulerService {
                 );
             }),
         );
-
-        return dd;
     }
 }

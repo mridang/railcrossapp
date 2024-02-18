@@ -43,12 +43,7 @@ describe('scheduler.service test', () => {
       },
     ]);
 
-    await schedulerService.updateSchedules(
-      'foo/bar',
-      '22',
-      '6',
-      'Europe/Helsinki',
-    );
+    await schedulerService.updateSchedules('foo/bar', 22, 6, 'Europe/Helsinki');
     expect(await schedulerService.listSchedules('foo/bar')).toMatchObject([
       {
         Arn: 'arn:aws:scheduler:us-east-1:000000000000:schedule/default/foo--bar-unlock',

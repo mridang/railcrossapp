@@ -3,11 +3,10 @@ import {ExpressAdapter} from '@nestjs/platform-express';
 import serverlessExpress from '@codegenie/serverless-express';
 import {Context, Handler} from 'aws-lambda';
 import express from 'express';
-
 import {AppModule} from './app.module';
-
 import {LoggerService} from '@nestjs/common';
 import {Logger} from '@aws-lambda-powertools/logger';
+import expressHandlebars from "express-handlebars";
 
 class PowertoolsLoggerService implements LoggerService {
     private logger: Logger;
@@ -51,6 +50,11 @@ let cachedServer: Handler;
 async function bootstrap() {
     if (!cachedServer) {
         const expressApp = express();
+        // @ts-ignore
+        expressApp.engine('handlebars', expressHandlebars());
+        expressApp.set('view engine', 'handlebars');
+        expressApp.set('views', './src/views');
+
         const nestApp = await NestFactory.create(
             AppModule,
             new ExpressAdapter(expressApp),
