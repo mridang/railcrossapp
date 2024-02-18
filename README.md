@@ -16,8 +16,6 @@ Any existing branch protection rules (even on the same branch) are not affected.
 ## Table of Contents
 
 - [Installation](#installation)
-- [Features](#features)
-- [Configuration](#configuration)
 - [Usage](#usage)
 - [Developing](#developing)
 - [Contributing](#contributing)
@@ -50,7 +48,7 @@ be configured with example values.
 - `APP_ID` is the unique identifier of your app and is used for authenticating to the GitHub API
 - `CLIENT_ID` is the unique client identifier of your app and is used for authenticating to the GitHub API
 - `WEBHOOK_SECRET` is the webhook secret of your app and is used for validating the webhook signatures
-- `JEST_GITHUB_PAT` is a personal access token that is used for the integration tests.
+- `JEST_GITHUB_PAT` is a personal access token used for the integration tests.
 - `JEST_GITHUB_REPO` is the name of a repository that is used for the integration tests.
 
 > [!NOTE]
@@ -117,6 +115,9 @@ in `docker-compose.yml`.
 If configured correctly, you should be able to run all the tests from
 your IDE.
 
+Jest has been configured to automatically collect coverage from tests
+and these can be found in the `.out` directory.
+
 ### Running the app
 
 To run the application locally, you can simply run `npx nest start`
@@ -139,8 +140,6 @@ application has been able to correctly initialize itself.
 If you have suggestions for how Railcross could be improved, or
 want to report a bug, open an issue - we'd love all and any
 contributions.
-
-For more, check out the [Contributing Guide](CONTRIBUTING.md).
 
 ## License
 

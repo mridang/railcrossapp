@@ -35,7 +35,7 @@ export default class SchedulerService {
       ScheduleExpression: `cron(0 8 ? * * *)`,
       FlexibleTimeWindow: { Mode: FlexibleTimeWindowMode.OFF },
       Target: {
-        Arn: `arn:aws:lambda:${process.env.AWS_REGION}:${process.env.ACCOUNT_ID}:function:lockdown-dev-unlocker`,
+        Arn: `arn:aws:lambda:${process.env.AWS_REGION}:${process.env.ACCOUNT_ID}:function:railcross-dev-unlocker`,
         RoleArn: this.schedulerRoleArn,
         Input: JSON.stringify({
           repo_name: repoName,
@@ -58,7 +58,7 @@ export default class SchedulerService {
       ScheduleExpression: `cron(0 16 ? * * *)`,
       FlexibleTimeWindow: { Mode: FlexibleTimeWindowMode.OFF },
       Target: {
-        Arn: `arn:aws:lambda:${process.env.AWS_REGION}:${process.env.ACCOUNT_ID}:function:lockdown-dev-locker`,
+        Arn: `arn:aws:lambda:${process.env.AWS_REGION}:${process.env.ACCOUNT_ID}:function:railcross-dev-locker`,
         RoleArn: this.schedulerRoleArn,
         Input: JSON.stringify({
           repo_name: repoName,

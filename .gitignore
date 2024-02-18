@@ -52,11 +52,9 @@ Thumbs.db
 
 # Next.js build output
 .next
-out/
 
 # Nuxt.js build output
 .nuxt
-dist/
 
 # Gatsby files
 .cache/
@@ -68,3 +66,6 @@ dist/
 
 # Serverless directories
 .serverless/
+
+# Jest coverage
+.out

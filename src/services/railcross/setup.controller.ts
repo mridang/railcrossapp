@@ -48,6 +48,8 @@ export class SetupController {
       throw new BadRequestException('Lock time must be after unlock time.');
     }
 
+    // noinspection BadExpressionStatementJS
+    this.schedulerService.updateSchedules;
     //await this.schedulerService.updateSchedules(scheduleDto.installation_id, scheduleDto.lock_time, scheduleDto.unlock_time, scheduleDto.timezone)
 
     return { message: 'Schedule created successfully', schedule: scheduleDto };
