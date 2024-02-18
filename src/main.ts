@@ -1,43 +1,44 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import { join } from 'path';
-import * as expressHandlebars from 'express-handlebars';
-import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import {NestFactory} from '@nestjs/core';
+import {AppModule} from './app.module';
+import {NestExpressApplication} from '@nestjs/platform-express';
+import {join} from 'path';
+import {BadRequestException, ValidationPipe} from '@nestjs/common';
+import {handlebars} from "hbs";
+import fs from "fs";
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  app.engine(
-    'hbs',
-    expressHandlebars.create({
-      defaultLayout: 'main',
-      extname: '.hbs',
-      partialsDir: ['views/partials/'],
-    }).engine,
-  );
-  app.set('view engine', 'hbs');
-  app.set('views', join(__dirname, '..', 'views'));
+    const nestApp = await NestFactory.create<NestExpressApplication>(AppModule);
+    nestApp.setViewEngine('hbs');
+    nestApp.setBaseViewsDir(join(__dirname, '..', 'views'));
+    nestApp.engine('hbs', (filePath: string, options: Record<string, any>, callback: (err: Error | null, rendered?: string) => void) => {
+        const template = handlebars.compile(fs.readFileSync(filePath, 'utf8'));
+        const result = template(options);
+        callback(null, result);
+    });
 
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transformOptions: {
-        enableImplicitConversion: true,
-      },
-      exceptionFactory: (errors) => {
-        const messages = errors.map((error) => ({
-          property: error.property,
-          constraints: error.constraints,
-        }));
-        return new BadRequestException(messages);
-      },
-    }),
-  );
+    nestApp.enableCors();
+    nestApp.useGlobalPipes(
+        new ValidationPipe({
+            transform: true,
+            whitelist: true,
+            forbidNonWhitelisted: true,
+            transformOptions: {
+                enableImplicitConversion: true,
+            },
+            exceptionFactory: (errors) => {
+                const messages = errors.map((error) => ({
+                    property: error.property,
+                    constraints: error.constraints,
+                }));
+                return new BadRequestException(messages);
+            },
+        }),
+    );
 
-  await app.listen(3000);
+    await nestApp.init();
+    await nestApp.listen(3000);
 }
 
-// noinspection JSIgnoredPromiseFromCall
-bootstrap();
+bootstrap().then(d => {
+    console.log(d)
+});

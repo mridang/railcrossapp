@@ -9,6 +9,7 @@ const serverlessConfiguration: AWS = {
   plugins: ['serverless-plugin-typescript', 'serverless-offline'],
   package: {
     individually: false,
+    patterns: ['**/*.hbs']
   },
   provider: {
     environment: {

@@ -1,18 +1,13 @@
-import { NestFactory } from '@nestjs/core';
-import { ExpressAdapter } from '@nestjs/platform-express';
+import {NestFactory} from '@nestjs/core';
+import {NestExpressApplication} from '@nestjs/platform-express';
 import serverlessExpress from '@codegenie/serverless-express';
-import {
-  APIGatewayProxyEvent,
-  APIGatewayProxyResult,
-  Callback,
-  Context,
-  Handler,
-} from 'aws-lambda';
-import express from 'express';
-import { AppModule } from './app.module';
-import { LoggerService } from '@nestjs/common';
-import { Logger } from '@aws-lambda-powertools/logger';
-import expressHandlebars from 'express-handlebars';
+import {APIGatewayProxyEvent, APIGatewayProxyResult, Callback, Context, Handler,} from 'aws-lambda';
+import {AppModule} from './app.module';
+import {BadRequestException, LoggerService, ValidationPipe} from '@nestjs/common';
+import {Logger} from '@aws-lambda-powertools/logger';
+import {join} from 'path';
+import {handlebars} from "hbs";
+import * as fs from "fs";
 
 class PowertoolsLoggerService implements LoggerService {
   private logger: Logger;
@@ -54,25 +49,39 @@ let cachedServer: Handler;
 
 async function bootstrap() {
   if (!cachedServer) {
-    const expressApp = express();
-    // @ts-expect-error since this cannot be empty
-    expressApp.engine('handlebars', expressHandlebars());
-    expressApp.set('view engine', 'handlebars');
-    expressApp.set('views', './src/views');
-
-    const nestApp = await NestFactory.create(
-      AppModule,
-      new ExpressAdapter(expressApp),
-      {
-        logger: new PowertoolsLoggerService(),
-      },
-    );
+    const nestApp = await NestFactory.create<NestExpressApplication>(AppModule, {
+      logger: new PowertoolsLoggerService(),
+    });
+    nestApp.setViewEngine('hbs');
+    nestApp.setBaseViewsDir(join(__dirname, 'views'));
+    nestApp.engine('hbs', (filePath: string, options: Record<string, any>, callback: (err: Error | null, rendered?: string) => void) => {
+      const template = handlebars.compile(fs.readFileSync(filePath, 'utf8'));
+      const result = template(options);
+      callback(null, result);
+    });
 
     nestApp.enableCors();
+    nestApp.useGlobalPipes(
+        new ValidationPipe({
+          transform: true,
+          whitelist: true,
+          forbidNonWhitelisted: true,
+          transformOptions: {
+            enableImplicitConversion: true,
+          },
+          exceptionFactory: (errors) => {
+            const messages = errors.map((error) => ({
+              property: error.property,
+              constraints: error.constraints,
+            }));
+            return new BadRequestException(messages);
+          },
+        }),
+    );
 
     await nestApp.init();
 
-    cachedServer = serverlessExpress({ app: expressApp });
+    cachedServer = serverlessExpress({ app: nestApp.getHttpAdapter().getInstance() });
   }
 
   return cachedServer;
