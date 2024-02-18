@@ -21,14 +21,6 @@ class PowertoolsLoggerService implements LoggerService {
     this.logger = new Logger();
   }
 
-  private formatMessage(message: string | object, context?: string): string {
-    if (typeof message === 'string') {
-      return context ? `${context}: ${message}` : message;
-    } else {
-      return JSON.stringify({ context, ...message });
-    }
-  }
-
   log(message: string | object, context?: string): void {
     this.logger.info(this.formatMessage(message, context));
   }
@@ -47,6 +39,14 @@ class PowertoolsLoggerService implements LoggerService {
 
   verbose(message: string | object, context?: string): void {
     this.logger.debug(this.formatMessage(message, context));
+  }
+
+  private formatMessage(message: string | object, context?: string): string {
+    if (typeof message === 'string') {
+      return context ? `${context}: ${message}` : message;
+    } else {
+      return JSON.stringify({ context, ...message });
+    }
   }
 }
 

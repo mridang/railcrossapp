@@ -1,6 +1,6 @@
 import type { AWS } from '@serverless/typescript';
-import packageJson from './package.json';
 import { AwsLambdaRuntime } from '@serverless/typescript';
+import packageJson from './package.json';
 import { roleName, scheduleGroup, secretName } from './src/constants';
 
 const serverlessConfiguration: AWS = {

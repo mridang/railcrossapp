@@ -7,8 +7,8 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export default class GithubConfig {
-  private readonly client = new SecretsManagerClient();
   private static readonly decoder = new TextDecoder('utf8');
+  private readonly client = new SecretsManagerClient();
 
   async getSecret(
     secretName: string,
