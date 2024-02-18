@@ -10,7 +10,7 @@ defaults:
     working-directory: ./
 
 jobs:
-  code-formatting:
+  app-testing:
     runs-on: ubuntu-latest
 
     steps:
@@ -33,5 +33,5 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Run Eslint
+      - name: Run Jest
         run: npm run test

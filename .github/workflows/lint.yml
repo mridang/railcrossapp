@@ -10,7 +10,7 @@ defaults:
     working-directory: ./
 
 jobs:
-  code-formatting:
+  code-linting:
     runs-on: ubuntu-latest
 
     steps:
