@@ -7,6 +7,7 @@ declare global {
   var DOCKER: any;
 }
 
+require('dotenv').config();
 // this allows test containers to work in build pipeline
 process.env.TESTCONTAINERS_RYUK_DISABLED = 'true';
 
