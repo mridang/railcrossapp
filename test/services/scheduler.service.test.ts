@@ -8,6 +8,10 @@ describe('scheduler.service test', () => {
         endpoint: 'http://localhost:4566',
         region: 'us-east-1',
         tls: false,
+        credentials: {
+          accessKeyId: 'test',
+          secretAccessKey: 'test',
+        },
       }),
       'default',
     );
