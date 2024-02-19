@@ -71,7 +71,7 @@ async function bootstrap() {
       'hbs',
       (
         filePath: string,
-        options: Record<string, any>,
+        options: Record<string, object>,
         callback: (err: Error | null, rendered?: string) => void,
       ) => {
         const template = handlebars.compile(fs.readFileSync(filePath, 'utf8'));

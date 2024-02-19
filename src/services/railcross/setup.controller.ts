@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { IsInt, Max, Min } from 'class-validator';
 import { IsSupportedTimeZone } from './timezone.validator';
-import SchedulerService from './scheduler.service';
 import RailcrossService from './railcross.service';
 
 class ScheduleDto {
