@@ -37,7 +37,7 @@
     "express-handlebars": "^7.1.2",
     "hbs": "^4.2.0",
     "probot": "^12.3.3",
-    "reflect-metadata": "^0.1.13"
+    "reflect-metadata": "^0.2.1"
   },
   "engines": {
     "node": "20.x"
