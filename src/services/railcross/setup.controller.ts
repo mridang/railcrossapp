@@ -4,11 +4,13 @@ import {
   Controller,
   Get,
   Post,
+  Query,
   Render,
 } from '@nestjs/common';
 import { IsInt, Max, Min } from 'class-validator';
 import { IsSupportedTimeZone } from './timezone.validator';
 import SchedulerService from './scheduler.service';
+import RailcrossService from './railcross.service';
 
 class ScheduleDto {
   @IsInt()
@@ -30,15 +32,20 @@ class ScheduleDto {
 
 @Controller('setup')
 export class SetupController {
-  constructor(private readonly schedulerService: SchedulerService) {
+  constructor(private readonly railcrossService: RailcrossService) {
     //
   }
 
   @Get()
   @Render('setup')
-  showSetup() {
+  showSetup(@Query('installation_id') installationId: string) {
+    if (!installationId) {
+      throw new Error('installation_id query parameter is required');
+    }
+
     return {
       timezones: Intl.supportedValuesOf('timeZone'),
+      installationId, // Pass the installationId to the template
     };
   }
 
@@ -48,9 +55,12 @@ export class SetupController {
       throw new BadRequestException('Lock time must be after unlock time.');
     }
 
-    // noinspection BadExpressionStatementJS
-    this.schedulerService.updateSchedules;
-    //await this.schedulerService.updateSchedules(scheduleDto.installation_id, scheduleDto.lock_time, scheduleDto.unlock_time, scheduleDto.timezone)
+    await this.railcrossService.updateSchedules(
+      scheduleDto.installation_id,
+      scheduleDto.lock_time,
+      scheduleDto.unlock_time,
+      scheduleDto.timezone,
+    );
 
     return { message: 'Schedule created successfully', schedule: scheduleDto };
   }

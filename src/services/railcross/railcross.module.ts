@@ -10,12 +10,14 @@ import GithubConfig from './github.config';
 import { Octokit } from '@octokit/rest';
 import { createAppAuth } from '@octokit/auth-app';
 import { SetupController } from './setup.controller';
+import RailcrossService from './railcross.service';
 
 @Module({
   controllers: [WebhookController, SetupController],
   providers: [
     ProtectionService,
     SchedulerService,
+    RailcrossService,
     RailcrossProbot,
     GithubConfig,
     {
@@ -66,7 +68,8 @@ import { SetupController } from './setup.controller';
           return new Octokit({
             authStrategy: createAppAuth,
             auth: {
-              ...secret,
+              appId: secret.appId,
+              privateKey: secret.privateKey,
               installationId: installationId,
             },
           });
