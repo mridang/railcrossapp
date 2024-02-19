@@ -36,7 +36,7 @@
     "class-validator": "^0.14.1",
     "express-handlebars": "^7.1.2",
     "hbs": "^4.2.0",
-    "probot": "^12.3.3",
+    "probot": "^13.0.2",
     "reflect-metadata": "^0.2.1"
   },
   "engines": {
