@@ -23,7 +23,7 @@ class PowertoolsLoggerService implements LoggerService {
   private logger: Logger;
 
   constructor() {
-    this.logger = new Logger();
+    this.logger = new Logger({ serviceName: process.env.SERVICE_NAME });
   }
 
   log(message: string | object, context?: string): void {

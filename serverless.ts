@@ -22,12 +22,16 @@ const serverlessConfiguration: AWS = {
     ],
   },
   provider: {
+    stage: '${opt:stage, "dev"}',
     environment: {
       NODE_OPTIONS: '--enable-source-maps',
       ACCOUNT_ID: '${aws:accountId}',
+      NODE_ENV: '${self:provider.stage}',
+      SERVICE_NAME: packageJson.name,
     },
     name: 'aws',
     runtime: `nodejs${packageJson.engines.node}` as AwsLambdaRuntime,
+    architecture: "arm64",
     iam: {
       role: {
         statements: [
