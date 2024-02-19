@@ -27,6 +27,7 @@
     "@nestjs/cqrs": "^10.2.6",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/serve-static": "^4.0.1",
+    "@nestjs/terminus": "^10.2.3",
     "@octokit/core": "^5.1.0",
     "@octokit/plugin-rest-endpoint-methods": "^10.2.0",
     "@octokit/rest": "^20.0.2",
