@@ -69,3 +69,6 @@ Thumbs.db
 
 # Jest coverage
 .out
+
+# Github Keys
+*.pem
