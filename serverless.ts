@@ -177,10 +177,10 @@ const serverlessConfiguration: AWS = {
           Name: secretName,
           Description: 'Secrets for my Github application',
           SecretString: JSON.stringify({
-            APP_ID: '823576',
-            CLIENT_ID: 'Iv1.9cb1f44a09b79eb0',
+            APP_ID: '',
+            CLIENT_ID: '',
             CLIENT_SECRET: '',
-            WEBHOOK_SECRET: 'yoloyoloyoloyoloyoloyolo',
+            WEBHOOK_SECRET: '',
             PRIVATE_KEY: '',
           }),
         },
