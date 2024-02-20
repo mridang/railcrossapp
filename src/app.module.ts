@@ -5,10 +5,12 @@ import { RailcrossModule } from './services/railcross/railcross.module';
 import { join } from 'path';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { TerminusModule } from '@nestjs/terminus';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
     RailcrossModule,
+    HttpModule,
     TerminusModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
