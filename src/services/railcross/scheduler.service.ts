@@ -100,6 +100,7 @@ export default class SchedulerService {
       } else if (schedule.Name.includes('-lock')) {
         await this.scheduler.send(
           new UpdateScheduleCommand({
+            GroupName: this.group,
             ScheduleExpressionTimezone: timeZone,
             ScheduleExpression: `cron(0 ${lockTime} ? * * *)`,
             FlexibleTimeWindow: { Mode: FlexibleTimeWindowMode.OFF },
@@ -117,6 +118,7 @@ export default class SchedulerService {
       } else if (schedule.Name.includes('-unlock')) {
         await this.scheduler.send(
           new UpdateScheduleCommand({
+            GroupName: this.group,
             ScheduleExpressionTimezone: timeZone,
             ScheduleExpression: `cron(0 ${unlockTime} ? * * *)`,
             FlexibleTimeWindow: { Mode: FlexibleTimeWindowMode.OFF },
