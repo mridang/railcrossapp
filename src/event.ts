@@ -1,6 +1,8 @@
 import ProtectionService from './services/railcross/protection.service';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { PowertoolsLoggerService } from './lambda';
 
 exports.lock = async ({
   installation_id,
@@ -9,8 +11,10 @@ exports.lock = async ({
   repo_name: string;
   installation_id: number;
 }) => {
-  const app = await NestFactory.createApplicationContext(AppModule);
-  const protectionService = app.get(ProtectionService);
+  const nestApp = await NestFactory.create<NestExpressApplication>(AppModule, {
+    logger: new PowertoolsLoggerService(),
+  });
+  const protectionService = nestApp.get(ProtectionService);
   await protectionService.toggleProtection(repo_name, installation_id, true);
 };
 
@@ -21,7 +25,9 @@ exports.unlock = async ({
   repo_name: string;
   installation_id: number;
 }) => {
-  const app = await NestFactory.createApplicationContext(AppModule);
-  const protectionService = app.get(ProtectionService);
+  const nestApp = await NestFactory.create<NestExpressApplication>(AppModule, {
+    logger: new PowertoolsLoggerService(),
+  });
+  const protectionService = nestApp.get(ProtectionService);
   await protectionService.toggleProtection(repo_name, installation_id, false);
 };

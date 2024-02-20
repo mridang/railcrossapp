@@ -31,7 +31,8 @@ import RailcrossService from './railcross.service';
 
         const probot = createProbot({
           overrides: {
-            ...secret,
+            appId: secret.appId,
+            privateKey: secret.privateKey,
           },
         });
 
