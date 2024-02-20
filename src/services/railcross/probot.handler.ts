@@ -1,19 +1,14 @@
 import { Probot } from 'probot';
-import ProtectionService from './protection.service';
 import SchedulerService from './scheduler.service';
 import { Injectable, Logger } from '@nestjs/common';
 
 @Injectable()
 export default class RailcrossProbot {
-  constructor(
-    private readonly railcrossService: ProtectionService,
-    private readonly schedulerService: SchedulerService,
-  ) {
+  constructor(private readonly schedulerService: SchedulerService) {
     //
   }
 
   init(): (p: Probot) => void {
-    const railcrossService: ProtectionService = this.railcrossService;
     const schedulerService: SchedulerService = this.schedulerService;
     return (app: Probot) => {
       const logger = new Logger(RailcrossProbot.name);
@@ -25,7 +20,6 @@ export default class RailcrossProbot {
         for (const repo of context.payload?.repositories || []) {
           logger.log(`Configuring schedules and rules for ${repo.full_name}`);
           await schedulerService.addLockSchedules(repo.full_name, id);
-          await railcrossService.toggleProtection(repo.full_name, id, true);
         }
       });
 
@@ -36,7 +30,6 @@ export default class RailcrossProbot {
         for (const repo of context.payload?.repositories_added || []) {
           logger.log(`Adding schedules and rules for ${repo.full_name}`);
           await schedulerService.addLockSchedules(repo.full_name, id);
-          await railcrossService.toggleProtection(repo.full_name, id, true);
         }
       });
 
