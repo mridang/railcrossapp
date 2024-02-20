@@ -4,9 +4,7 @@
   "scripts": {
     "build": "sls package",
     "deploy": "sls deploy --aws-profile=mridang",
-    "copy-files": "cp -r src/views dist/src/views",
-    "start": "npm run build && npm run copy-files && node dist/src/server.js",
-    "start:slack": "npm run build && node slack.js",
+    "start": "npx nest start",
     "test": "jest --verbose --config=jest.config.js --runInBand",
     "test:watch": "npm run test -- --watch",
     "test:debug": "jest --verbose --config=jest.config.js --runInBand --detectOpenHandles",
