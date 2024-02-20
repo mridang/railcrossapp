@@ -77,6 +77,7 @@ export default class SchedulerService {
   }
 
   async updateSchedules(
+    installationId: number,
     repoName: string,
     lockTime: number,
     unlockTime: number,
@@ -102,8 +103,14 @@ export default class SchedulerService {
             ScheduleExpressionTimezone: timeZone,
             ScheduleExpression: `cron(0 ${lockTime} ? * * *)`,
             FlexibleTimeWindow: { Mode: FlexibleTimeWindowMode.OFF },
-            // @ts-expect-error since this cannot be empty
-            Target: schedule.Target,
+            Target: {
+              Arn: `arn:aws:lambda:${process.env.AWS_REGION}:${process.env.ACCOUNT_ID}:function:railcross-dev-locker`,
+              RoleArn: this.schedulerRoleArn,
+              Input: JSON.stringify({
+                repo_name: repoName,
+                installation_id: installationId,
+              }),
+            },
             Name: schedule.Name,
           }),
         );
@@ -113,8 +120,14 @@ export default class SchedulerService {
             ScheduleExpressionTimezone: timeZone,
             ScheduleExpression: `cron(0 ${unlockTime} ? * * *)`,
             FlexibleTimeWindow: { Mode: FlexibleTimeWindowMode.OFF },
-            // @ts-expect-error since this cannot be empty
-            Target: schedule.Target,
+            Target: {
+              Arn: `arn:aws:lambda:${process.env.AWS_REGION}:${process.env.ACCOUNT_ID}:function:railcross-dev-unlocker`,
+              RoleArn: this.schedulerRoleArn,
+              Input: JSON.stringify({
+                repo_name: repoName,
+                installation_id: installationId,
+              }),
+            },
             Name: schedule.Name,
           }),
         );

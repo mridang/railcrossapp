@@ -27,6 +27,7 @@ export default class RailcrossService {
       await octokit.rest.apps.listReposAccessibleToInstallation();
     for (const repo of data.repositories) {
       await this.schedulerService.updateSchedules(
+        installationId,
         repo.full_name,
         lockTime,
         unlockTime,
