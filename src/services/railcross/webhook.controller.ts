@@ -6,8 +6,8 @@ import {
   Req,
 } from '@nestjs/common';
 import { Probot } from 'probot';
-import { EmitterWebhookEventName } from '@octokit/webhooks/dist-types/types';
 import { Request } from 'express';
+import { WebhookEventName } from '@octokit/webhooks-types';
 
 @Controller('hook')
 export class WebhookController {
@@ -36,7 +36,7 @@ export class WebhookController {
                 ? signature.join('|')
                 : signature,
               payload,
-              name: name as EmitterWebhookEventName,
+              name: name as WebhookEventName,
             });
           } else {
             throw new BadRequestException('Missing webhook request body');
