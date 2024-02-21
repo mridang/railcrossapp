@@ -23,7 +23,7 @@ jobs:
           node-version-file: '.nvmrc'
 
       - name: Cache node modules
-        uses: actions/cache@v4
+        uses: actions/cache@v3
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
@@ -38,3 +38,6 @@ jobs:
         env:
           JEST_GITHUB_REPO: ${{ secrets.JEST_GITHUB_REPO }}
           JEST_GITHUB_PAT: ${{ secrets.JEST_GITHUB_PAT }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.AWS_REGION }}
