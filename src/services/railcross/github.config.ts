@@ -11,19 +11,19 @@ export default class GithubConfig {
   private readonly client = new SecretsManagerClient();
 
   async getSecret(
-      secretName: string,
+    secretName: string,
   ): Promise<{ appId: string; privateKey: string; secret: string }> {
     const command: GetSecretValueCommand = new GetSecretValueCommand({
       SecretId: secretName,
     });
 
     const data: GetSecretValueResponse = (await this.client.send(
-        command,
+      command,
     )) as GetSecretValueResponse;
     // Secrets Manager stores the secret data as a string in either `SecretString` or `SecretBinary`
     if (data.SecretString) {
       const { APP_ID, PRIVATE_KEY, WEBHOOK_SECRET } = JSON.parse(
-          data.SecretString,
+        data.SecretString,
       );
       return {
         appId: APP_ID,
@@ -35,7 +35,7 @@ export default class GithubConfig {
         // If the secret is binary, you might need to decode it
         const buff = GithubConfig.decoder.decode(data.SecretBinary);
         const { APP_ID, PRIVATE_KEY, WEBHOOK_SECRET } = JSON.parse(
-            buff.toString(),
+          buff.toString(),
         );
         return {
           appId: APP_ID,
