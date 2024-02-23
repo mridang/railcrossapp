@@ -28,7 +28,7 @@
     "@nestjs/serve-static": "^4.0.1",
     "@nestjs/terminus": "^10.2.3",
     "@octokit/core": "^5.1.0",
-    "@octokit/plugin-rest-endpoint-methods": "^10.2.0",
+    "@octokit/plugin-rest-endpoint-methods": "^10.4.0",
     "@octokit/rest": "^20.0.2",
     "@slack/bolt": "^3.16.0",
     "class-transformer": "^0.5.1",
