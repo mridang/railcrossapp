@@ -15,7 +15,7 @@
     "serverless": "serverless"
   },
   "dependencies": {
-    "@aws-lambda-powertools/logger": "^1.18.0",
+    "@aws-lambda-powertools/logger": "^1.18.1",
     "@aws-sdk/client-scheduler": "^3.511.0",
     "@aws-sdk/client-secrets-manager": "^3.511.0",
     "@codegenie/serverless-express": "^4.3.0",
