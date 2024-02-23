@@ -35,7 +35,9 @@ export class End2EndModule {
       .setLogger(new Logger()) // See https://stackoverflow.com/questions/71677866/
       .compile();
 
-    const app = moduleFixture.createNestApplication<NestExpressApplication>();
+    const app = moduleFixture.createNestApplication<NestExpressApplication>({
+      rawBody: true,
+    });
     app.setBaseViewsDir(join(__dirname, '..', 'views'));
     app.setViewEngine('hbs');
 

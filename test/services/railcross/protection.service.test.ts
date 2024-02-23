@@ -1,5 +1,5 @@
 import { Octokit } from '@octokit/rest';
-import ProtectionService from '../../src/services/railcross/protection.service';
+import ProtectionService from '../../../src/services/railcross/protection.service';
 
 describe('protection.service test', () => {
   const repoName: string = process.env.JEST_GITHUB_REPO as string;

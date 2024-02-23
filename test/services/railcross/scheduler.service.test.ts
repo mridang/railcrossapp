@@ -1,5 +1,5 @@
 import { SchedulerClient } from '@aws-sdk/client-scheduler';
-import SchedulerService from '../../src/services/railcross/scheduler.service';
+import SchedulerService from '../../../src/services/railcross/scheduler.service';
 
 describe('scheduler.service test', () => {
   test('that schedules are added"', async () => {

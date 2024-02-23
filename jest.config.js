@@ -13,7 +13,7 @@ module.exports = {
   resetModules: false,
   collectCoverage: true,
   coverageDirectory: './.out',
-  collectCoverageFrom: ['**/*.{ts,dts}', '!**/node_modules/**', '!**/test/**'],
+  collectCoverageFrom: ['src/**/*.{js,ts,dts}'],
   coverageReporters: ['lcov', 'text'],
   coveragePathIgnorePatterns: ['/dist/'],
   testTimeout: 60000,

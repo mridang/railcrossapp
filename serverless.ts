@@ -32,6 +32,7 @@ const serverlessConfiguration: AWS = {
     name: 'aws',
     runtime: `nodejs${packageJson.engines.node}` as AwsLambdaRuntime,
     architecture: 'arm64',
+    memorySize: 256,
     iam: {
       role: {
         statements: [
