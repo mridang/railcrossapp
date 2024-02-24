@@ -21,6 +21,11 @@ Any existing branch protection rules (even on the same branch) are not affected.
 - [Contributing](#contributing)
 - [License](#license)
 
+## Architehture
+
+<img width="1263" alt="Screenshot 2024-02-24 at 22 39 51" src="https://github.com/mridang/railcrossapp/assets/327432/96d7ce2a-162d-4899-b4ae-bae6e8662c47">
+
+
 ## Installation
 
 1. Go to the [Railcross](https://github.com/apps/railcross) page on GitHub Marketplace
