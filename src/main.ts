@@ -48,6 +48,6 @@ async function bootstrap() {
   await nestApp.listen(3000);
 }
 
-bootstrap().then((d) => {
-  console.log(d);
+bootstrap().then(() => {
+  console.log('\x07');
 });

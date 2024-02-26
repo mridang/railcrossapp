@@ -19,7 +19,7 @@ import { join } from 'path';
 import { handlebars } from 'hbs';
 import * as fs from 'fs';
 
-export class PowertoolsLoggerService implements LoggerService {
+class PowertoolsLoggerService implements LoggerService {
   private logger: Logger;
 
   constructor() {
@@ -63,6 +63,7 @@ async function bootstrap() {
       AppModule,
       {
         logger: new PowertoolsLoggerService(),
+        rawBody: true,
       },
     );
     nestApp.setViewEngine('hbs');

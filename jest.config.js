@@ -9,7 +9,7 @@ module.exports = {
   moduleNameMapper: {
     '#(.*)': '<rootDir>/src/$1',
   },
-  testPathIgnorePatterns: ['/node_modules/', '/frontend/'],
+  testPathIgnorePatterns: ['/node_modules/', '/frontend/', '/dist/'],
   resetModules: false,
   collectCoverage: true,
   coverageDirectory: './.out',
