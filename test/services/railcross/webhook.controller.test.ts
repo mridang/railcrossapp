@@ -1,3 +1,4 @@
+import { expect } from '@jest/globals';
 import request from 'supertest';
 import { HttpStatus } from '@nestjs/common';
 import { End2EndModule } from '../../e2e.module';
@@ -29,6 +30,9 @@ describe('webhook.controller test', () => {
       .get(GithubConfig)
       .getSecret(secretName);
 
+    console.log('mosos');
+    console.log(JSON.stringify(webhookSecret));
+    console.log(process.env);
     const payload = {
       action: 'opened',
       issue: {

@@ -3,6 +3,7 @@ import {
   Controller,
   Inject,
   Post,
+  RawBodyRequest,
   Req,
 } from '@nestjs/common';
 import { Probot } from 'probot';
@@ -18,8 +19,26 @@ export class WebhookController {
     //
   }
 
+  private static getPayload(request: Request): Promise<string> | null {
+    if ('body' in request) {
+      if (
+        typeof request.body === 'object' &&
+        'rawBody' in request &&
+        request.rawBody instanceof Buffer
+      ) {
+        // The body is already an Object and rawBody is a Buffer (e.g. GCF)
+        return Promise.resolve(request.rawBody.toString('utf8'));
+      } else {
+        // The body is a String (e.g. Lambda)
+        return Promise.resolve(request.body);
+      }
+    } else {
+      return null;
+    }
+  }
+
   @Post()
-  async handleWebhook(@Req() request: Request & { customProperty: string }) {
+  async handleWebhook(@Req() request: RawBodyRequest<Request>) {
     const id = request.headers['x-github-delivery'];
     if (id !== null && id !== undefined) {
       const name = request.headers['x-github-event'];
@@ -49,24 +68,6 @@ export class WebhookController {
       }
     } else {
       throw new BadRequestException('Missing x-github-delivery header');
-    }
-  }
-
-  private static getPayload(request: Request): Promise<string> | null {
-    if ('body' in request) {
-      if (
-        typeof request.body === 'object' &&
-        'rawBody' in request &&
-        request.rawBody instanceof Buffer
-      ) {
-        // The body is already an Object and rawBody is a Buffer (e.g. GCF)
-        return Promise.resolve(request.rawBody.toString('utf8'));
-      } else {
-        // The body is a String (e.g. Lambda)
-        return Promise.resolve(request.body);
-      }
-    } else {
-      return null;
     }
   }
 }

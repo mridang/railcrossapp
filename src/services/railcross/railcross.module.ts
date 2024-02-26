@@ -11,6 +11,7 @@ import { Octokit } from '@octokit/rest';
 import { createAppAuth } from '@octokit/auth-app';
 import { SetupController } from './setup.controller';
 import RailcrossService from './railcross.service';
+import ProbotHandler from './probot.handler';
 
 @Module({
   controllers: [WebhookController, SetupController],
@@ -21,22 +22,21 @@ import RailcrossService from './railcross.service';
     RailcrossProbot,
     GithubConfig,
     {
-      inject: [GithubConfig, RailcrossProbot],
+      inject: [GithubConfig, ProbotHandler],
       provide: 'PROBOT',
       useFactory: async (
         githubConfig: GithubConfig,
-        railcrossProbot: RailcrossProbot,
+        probotHandler: ProbotHandler,
       ) => {
         const secret = await githubConfig.getSecret(secretName);
 
         const probot = createProbot({
           overrides: {
-            appId: secret.appId,
-            privateKey: secret.privateKey,
+            ...secret,
           },
         });
 
-        await probot.load(railcrossProbot.init());
+        await probot.load(probotHandler.init());
 
         return probot;
       },

@@ -19,7 +19,7 @@ import { join } from 'path';
 import { handlebars } from 'hbs';
 import * as fs from 'fs';
 
-class PowertoolsLoggerService implements LoggerService {
+export class PowertoolsLoggerService implements LoggerService {
   private logger: Logger;
 
   constructor() {
