@@ -1,3 +1,4 @@
+import { expect } from '@jest/globals';
 import { End2EndModule } from './e2e.module';
 import { AppModule } from '../src/app.module';
 import request from 'supertest';

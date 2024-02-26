@@ -1,3 +1,4 @@
+import { expect } from '@jest/globals';
 import { Octokit } from '@octokit/rest';
 import ProtectionService from '../../../src/services/railcross/protection.service';
 
