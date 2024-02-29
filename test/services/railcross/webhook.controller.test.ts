@@ -25,7 +25,7 @@ describe('webhook.controller test', () => {
     await testModule.afterAll();
   });
 
-  it('/hook (POST)', async () => {
+  it('should return 201 when the headers all valid', async () => {
     const webhookSecret = await testModule.app
       .get(GithubConfig)
       .getSecret(secretName);
