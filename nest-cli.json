@@ -8,6 +8,11 @@
       {
         "include": "**/*.hbs",
         "watchAssets": true
+      },
+      {
+        "include": "../public/**/*",
+        "outDir": "dist/public",
+        "watchAssets": true
       }
     ]
   }

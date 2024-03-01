@@ -18,6 +18,7 @@ import { Logger } from '@aws-lambda-powertools/logger';
 import { join } from 'path';
 import { handlebars } from 'hbs';
 import * as fs from 'fs';
+import helmet from 'helmet';
 
 export class PowertoolsLoggerService implements LoggerService {
   private logger: Logger;
@@ -81,6 +82,7 @@ async function bootstrap() {
       },
     );
 
+    nestApp.use(helmet());
     nestApp.enableCors();
     nestApp.useGlobalPipes(
       new ValidationPipe({

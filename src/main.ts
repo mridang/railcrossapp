@@ -5,6 +5,7 @@ import { join } from 'path';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { handlebars } from 'hbs';
 import fs from 'fs';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const nestApp = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -25,6 +26,7 @@ async function bootstrap() {
     },
   );
 
+  nestApp.use(helmet());
   nestApp.enableCors();
   nestApp.useGlobalPipes(
     new ValidationPipe({
