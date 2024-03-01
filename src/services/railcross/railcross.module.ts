@@ -12,6 +12,9 @@ import { createAppAuth } from '@octokit/auth-app';
 import { SetupController } from './setup.controller';
 import RailcrossService from './railcross.service';
 import ProbotHandler from './probot.handler';
+import { retry } from '@octokit/plugin-retry';
+
+const MyOctokit = Octokit.plugin(retry);
 
 @Module({
   controllers: [WebhookController, SetupController],
@@ -66,12 +69,15 @@ import ProbotHandler from './probot.handler';
         const secret = await githubConfig.getSecret(secretName);
 
         return (installationId: number) => {
-          return new Octokit({
+          return new MyOctokit({
             authStrategy: createAppAuth,
             auth: {
               appId: secret.appId,
               privateKey: secret.privateKey,
               installationId: installationId,
+            },
+            retry: {
+              doNotRetry: ['429'],
             },
           });
         };
