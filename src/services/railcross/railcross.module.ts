@@ -13,6 +13,8 @@ import { SetupController } from './setup.controller';
 import RailcrossService from './railcross.service';
 import ProbotHandler from './probot.handler';
 import { retry } from '@octokit/plugin-retry';
+import path from 'path';
+import { SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
 
 const MyOctokit = Octokit.plugin(retry);
 
@@ -23,6 +25,16 @@ const MyOctokit = Octokit.plugin(retry);
     SchedulerService,
     RailcrossService,
     RailcrossProbot,
+    {
+      provide: 'ENV_PATH',
+      useValue: process.env.ENV_PATH || path.resolve(process.cwd(), '.env'),
+    },
+    {
+      provide: 'SECRETS_MANAGER_CLIENT',
+      useFactory: () => {
+        return new SecretsManagerClient();
+      },
+    },
     GithubConfig,
     {
       inject: [GithubConfig, ProbotHandler],
