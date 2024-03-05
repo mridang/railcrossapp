@@ -50,6 +50,7 @@ async function bootstrap() {
   await nestApp.listen(3000);
 }
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 bootstrap().then(() => {
   console.log('\x07');
 });

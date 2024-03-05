@@ -23,6 +23,7 @@ export class End2EndModule {
     >;
     providers?: Provider[];
   }) {
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     this.imports = options.imports ?? [];
     this.providers = options.providers ?? [];
   }
