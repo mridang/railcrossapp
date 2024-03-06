@@ -24,6 +24,11 @@ const serverlessConfiguration: AWS = {
   },
   provider: {
     stage: '${opt:stage, "dev"}',
+    tags: {
+      "sls:meta:project": packageJson.name,
+      "sls:meta:repo": packageJson.repository.url,
+      "sls:meta:environment": '${opt:stage, "dev"}'
+    },
     environment: {
       NODE_OPTIONS: '--enable-source-maps',
       ACCOUNT_ID: '${aws:accountId}',
