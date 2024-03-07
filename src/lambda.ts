@@ -9,52 +9,13 @@ import {
   Handler,
 } from 'aws-lambda';
 import { AppModule } from './app.module';
-import {
-  BadRequestException,
-  LoggerService,
-  ValidationPipe,
-} from '@nestjs/common';
-import { Logger } from '@aws-lambda-powertools/logger';
+import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { join } from 'path';
 import { handlebars } from 'hbs';
 import * as fs from 'fs';
 import helmet from 'helmet';
-
-export class PowertoolsLoggerService implements LoggerService {
-  private logger: Logger;
-
-  constructor() {
-    this.logger = new Logger({ serviceName: process.env.SERVICE_NAME });
-  }
-
-  log(message: string | object, context?: string): void {
-    this.logger.info(this.formatMessage(message, context));
-  }
-
-  error(message: string | object, trace?: string, context?: string): void {
-    this.logger.error(this.formatMessage(message, context), { trace });
-  }
-
-  warn(message: string | object, context?: string): void {
-    this.logger.warn(this.formatMessage(message, context));
-  }
-
-  debug(message: string | object, context?: string): void {
-    this.logger.debug(this.formatMessage(message, context));
-  }
-
-  verbose(message: string | object, context?: string): void {
-    this.logger.debug(this.formatMessage(message, context));
-  }
-
-  private formatMessage(message: string | object, context?: string): string {
-    if (typeof message === 'string') {
-      return context ? `${context}: ${message}` : message;
-    } else {
-      return JSON.stringify({ context, ...message });
-    }
-  }
-}
+import cookieParser from 'cookie-parser';
+import { PowertoolsLoggerService } from './app.logger';
 
 let cachedServer: Handler;
 
@@ -82,6 +43,7 @@ async function bootstrap() {
       },
     );
 
+    nestApp.use(cookieParser());
     nestApp.use(helmet());
     nestApp.enableCors();
     nestApp.useGlobalPipes(

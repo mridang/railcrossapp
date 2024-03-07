@@ -6,6 +6,7 @@ import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { handlebars } from 'hbs';
 import fs from 'fs';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const nestApp = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -26,6 +27,7 @@ async function bootstrap() {
     },
   );
 
+  nestApp.use(cookieParser());
   nestApp.use(helmet());
   nestApp.enableCors();
   nestApp.useGlobalPipes(
