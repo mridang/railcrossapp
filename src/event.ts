@@ -2,7 +2,7 @@ import ProtectionService from './services/railcross/protection.service';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { PowertoolsLoggerService } from './lambda';
+import { PowertoolsLoggerService } from './app.logger';
 
 exports.lock = async ({
   installation_id,
