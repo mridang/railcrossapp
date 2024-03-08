@@ -36,6 +36,9 @@ const serverlessConfiguration: AWS = {
       SERVICE_NAME: packageJson.name,
     },
     name: 'aws',
+    tracing: {
+      lambda: true,
+    },
     runtime: `nodejs${packageJson.engines.node}` as AwsLambdaRuntime,
     architecture: 'arm64',
     memorySize: 256,
