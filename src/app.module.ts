@@ -14,6 +14,7 @@ import { HttpModule } from '@nestjs/axios';
     TerminusModule,
     ServeStaticModule.forRoot({
       rootPath: join(__dirname, '..', 'public'),
+      serveRoot: '/static',
     }),
     ConfigModule.forRoot({
       isGlobal: true,

@@ -12,6 +12,7 @@ const serverlessConfiguration: AWS = {
     patterns: [
       'public/**/*',
       '**/*.hbs',
+      '**/*.html',
       '!test',
       '!jest.config.js',
       '!jest.config.js.map',

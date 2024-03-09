@@ -10,6 +10,10 @@
         "watchAssets": true
       },
       {
+        "include": "**/*.html",
+        "watchAssets": true
+      },
+      {
         "include": "../public/**/*",
         "outDir": "dist/public",
         "watchAssets": true

@@ -9,6 +9,7 @@ import {
 import { join } from 'path';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test } from '@nestjs/testing';
+import { CustomHttpExceptionFilter } from '../src/errorpage.exception.filter';
 
 export class End2EndModule {
   app!: INestApplication;
@@ -39,6 +40,7 @@ export class End2EndModule {
     const app = moduleFixture.createNestApplication<NestExpressApplication>({
       rawBody: true,
     });
+    app.useGlobalFilters(new CustomHttpExceptionFilter());
     app.setBaseViewsDir(join(__dirname, '..', 'views'));
     app.setViewEngine('hbs');
 

@@ -7,11 +7,13 @@ import { handlebars } from 'hbs';
 import fs from 'fs';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
+import { CustomHttpExceptionFilter } from './errorpage.exception.filter';
 
 async function bootstrap() {
   const nestApp = await NestFactory.create<NestExpressApplication>(AppModule, {
     rawBody: true,
   });
+  nestApp.useGlobalFilters(new CustomHttpExceptionFilter());
   nestApp.setViewEngine('hbs');
   nestApp.setBaseViewsDir(join(__dirname, '..', 'views'));
   nestApp.engine(

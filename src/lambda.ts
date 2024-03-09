@@ -16,6 +16,7 @@ import * as fs from 'fs';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import { PowertoolsLoggerService } from './app.logger';
+import { CustomHttpExceptionFilter } from './errorpage.exception.filter';
 
 let cachedServer: Handler;
 
@@ -28,6 +29,7 @@ async function bootstrap() {
         rawBody: true,
       },
     );
+    nestApp.useGlobalFilters(new CustomHttpExceptionFilter());
     nestApp.setViewEngine('hbs');
     nestApp.setBaseViewsDir(join(__dirname, 'views'));
     nestApp.engine(
