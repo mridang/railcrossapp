@@ -8,19 +8,19 @@ import {
 } from '@nestjs/common';
 import { join } from 'path';
 import { type NestExpressApplication } from '@nestjs/platform-express';
-import { Test } from '@nestjs/testing';
+import { Test, TestingModuleBuilder } from '@nestjs/testing';
 import { CustomHttpExceptionFilter } from '../src/errorpage.exception.filter';
 
 export class End2EndModule {
   app!: INestApplication;
   private readonly imports: Array<
-    Type | DynamicModule | Promise<DynamicModule> | ForwardReference
+      Type | DynamicModule | Promise<DynamicModule> | ForwardReference
   >;
   private readonly providers: Provider[];
 
   constructor(options: {
     imports?: Array<
-      Type | DynamicModule | Promise<DynamicModule> | ForwardReference
+        Type | DynamicModule | Promise<DynamicModule> | ForwardReference
     >;
     providers?: Provider[];
   }) {
@@ -29,13 +29,17 @@ export class End2EndModule {
     this.providers = options.providers ?? [];
   }
 
-  async beforeAll(): Promise<void> {
-    const moduleFixture = await Test.createTestingModule({
-      imports: [...this.imports],
-      providers: [...this.providers],
-    })
-      .setLogger(new Logger()) // See https://stackoverflow.com/questions/71677866/
-      .compile();
+  async beforeAll(
+      testFn: (testModule: TestingModuleBuilder) => TestingModuleBuilder = (
+          testModule,
+      ) => testModule,
+  ): Promise<void> {
+    const moduleFixture = await testFn(
+        Test.createTestingModule({
+          imports: [...this.imports],
+          providers: [...this.providers],
+        }).setLogger(new Logger()), // See https://stackoverflow.com/questions/71677866/
+    ).compile();
 
     const app = moduleFixture.createNestApplication<NestExpressApplication>({
       rawBody: true,
