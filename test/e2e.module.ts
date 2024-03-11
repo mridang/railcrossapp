@@ -6,10 +6,9 @@ import {
   type Provider,
   type Type,
 } from '@nestjs/common';
-import { join } from 'path';
 import { type NestExpressApplication } from '@nestjs/platform-express';
 import { Test, TestingModuleBuilder } from '@nestjs/testing';
-import { CustomHttpExceptionFilter } from '../src/errorpage.exception.filter';
+import configure from '../src/app';
 
 export class End2EndModule {
   app!: INestApplication;
@@ -45,16 +44,15 @@ export class End2EndModule {
       }).setLogger(new Logger()), // See https://stackoverflow.com/questions/71677866/
     ).compile();
 
-    const app = moduleFixture.createNestApplication<NestExpressApplication>({
-      rawBody: true,
-    });
-    app.useGlobalFilters(new CustomHttpExceptionFilter());
-    app.setBaseViewsDir(join(__dirname, '..', 'views'));
-    app.setViewEngine('hbs');
+    const nestApp = moduleFixture.createNestApplication<NestExpressApplication>(
+      {
+        rawBody: true,
+      },
+    );
 
-    await app.init();
-
-    this.app = app;
+    configure(nestApp);
+    await nestApp.init();
+    this.app = nestApp;
   }
 
   async afterAll(): Promise<void> {

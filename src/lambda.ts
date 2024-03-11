@@ -9,14 +9,8 @@ import {
   Handler,
 } from 'aws-lambda';
 import { AppModule } from './app.module';
-import { BadRequestException, ValidationPipe } from '@nestjs/common';
-import { join } from 'path';
-import { handlebars } from 'hbs';
-import * as fs from 'fs';
-import helmet from 'helmet';
-import cookieParser from 'cookie-parser';
 import { PowertoolsLoggerService } from './app.logger';
-import { CustomHttpExceptionFilter } from './errorpage.exception.filter';
+import configure from './app';
 
 let cachedServer: Handler;
 
@@ -29,43 +23,8 @@ async function bootstrap() {
         rawBody: true,
       },
     );
-    nestApp.useGlobalFilters(new CustomHttpExceptionFilter());
-    nestApp.setViewEngine('hbs');
-    nestApp.setBaseViewsDir(join(__dirname, 'views'));
-    nestApp.engine(
-      'hbs',
-      (
-        filePath: string,
-        options: Record<string, object>,
-        callback: (err: Error | null, rendered?: string) => void,
-      ) => {
-        const template = handlebars.compile(fs.readFileSync(filePath, 'utf8'));
-        const result = template(options);
-        callback(null, result);
-      },
-    );
 
-    nestApp.use(cookieParser());
-    nestApp.use(helmet());
-    nestApp.enableCors();
-    nestApp.useGlobalPipes(
-      new ValidationPipe({
-        transform: true,
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transformOptions: {
-          enableImplicitConversion: true,
-        },
-        exceptionFactory: (errors) => {
-          const messages = errors.map((error) => ({
-            property: error.property,
-            constraints: error.constraints,
-          }));
-          return new BadRequestException(messages);
-        },
-      }),
-    );
-
+    configure(nestApp);
     await nestApp.init();
 
     cachedServer = serverlessExpress({

@@ -17,15 +17,15 @@ export class CustomHttpExceptionFilter implements ExceptionFilter {
 
   constructor() {
     this.logger.log(
-        `Looking for error pages ${path.join(__dirname, '..', 'views', 'errors')}`,
+      `Looking for error pages ${path.join(__dirname, '..', 'views', 'errors')}`,
     );
     if (
-        fs.existsSync(path.join(__dirname, '..', 'views', 'errors', `500.html`))
+      fs.existsSync(path.join(__dirname, '..', 'views', 'errors', `500.html`))
     ) {
       this.basePath = path.join(__dirname, '..', 'views', 'errors');
     } else {
       this.logger.log(
-          `Looking for error pages ${path.join(__dirname, 'views', 'errors')}`,
+        `Looking for error pages ${path.join(__dirname, 'views', 'errors')}`,
       );
       if (fs.existsSync(path.join(__dirname, 'views', 'errors', `500.html`))) {
         this.basePath = path.join(__dirname, 'views', 'errors');
@@ -36,13 +36,13 @@ export class CustomHttpExceptionFilter implements ExceptionFilter {
   }
   catch(exception: Error, host: ArgumentsHost) {
     if (
-        exception instanceof HttpException ||
-        CustomHttpExceptionFilter.isHttpError(exception)
+      exception instanceof HttpException ||
+      CustomHttpExceptionFilter.isHttpError(exception)
     ) {
       const status =
-          exception instanceof HttpException
-              ? exception.getStatus()
-              : exception.statusCode;
+        exception instanceof HttpException
+          ? exception.getStatus()
+          : exception.statusCode;
 
       this.showError(status, host.switchToHttp());
     } else {
@@ -57,7 +57,7 @@ export class CustomHttpExceptionFilter implements ExceptionFilter {
         ctx.getResponse<Response>().status(status).sendFile(filePath);
       } else {
         throw new Error(
-            `Error page not found for status code: ${status}, serving JSON error response instead.`,
+          `Error page not found for status code: ${status}, serving JSON error response instead.`,
         );
       }
     } else {
@@ -75,7 +75,7 @@ export class CustomHttpExceptionFilter implements ExceptionFilter {
    */
   /* eslint-disable @typescript-eslint/no-explicit-any */
   private static isHttpError(
-      err: any,
+    err: any,
   ): err is { statusCode: number; message: string } {
     return err?.statusCode && err?.message;
   }
