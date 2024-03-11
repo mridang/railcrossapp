@@ -26,10 +26,8 @@ export class WebhookController {
         'rawBody' in request &&
         request.rawBody instanceof Buffer
       ) {
-        // The body is already an Object and rawBody is a Buffer (e.g. GCF)
         return Promise.resolve(request.rawBody.toString('utf8'));
       } else {
-        // The body is a String (e.g. Lambda)
         return Promise.resolve(request.body);
       }
     } else {

@@ -44,7 +44,7 @@ export class SetupController {
 
     return {
       timezones: Intl.supportedValuesOf('timeZone'),
-      installationId, // Pass the installationId to the template
+      installationId,
     };
   }
 
