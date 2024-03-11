@@ -1,6 +1,7 @@
 import { expect } from '@jest/globals';
 import { APIGatewayProxyEvent, Context } from 'aws-lambda';
 import { handler } from '../src/lambda';
+import { HttpStatus } from '@nestjs/common';
 
 describe('Lambda Handler', () => {
   it('should log output on /health route', async () => {
@@ -44,7 +45,7 @@ describe('Lambda Handler', () => {
       (error, result) => {
         expect(error).toBeNull();
         expect(result).toBeDefined();
-        expect(result?.statusCode).toEqual(200);
+        expect(result?.statusCode).toEqual(HttpStatus.OK);
       },
     );
   });

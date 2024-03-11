@@ -50,7 +50,7 @@ describe('CustomHttpExceptionFilter without mocks', () => {
       },
       json: function (jsonError: object) {
         expect(jsonError).toMatchObject({
-          statusCode: 404,
+          statusCode: HttpStatus.NOT_FOUND,
           path: '/test',
         });
       },

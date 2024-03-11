@@ -1,12 +1,28 @@
+import { expect } from '@jest/globals';
 import { End2EndModule } from './e2e.module';
 import { AppModule } from '../src/app.module';
 import request from 'supertest';
 import {
+  Body,
   Controller,
   Get,
   HttpStatus,
   InternalServerErrorException,
+  Post,
+  Req,
+  Res,
 } from '@nestjs/common';
+import { Request, Response } from 'express';
+import { IsEmail, IsNotEmpty } from 'class-validator';
+
+class TestDTO {
+  @IsNotEmpty()
+  @IsEmail()
+  email?: string;
+
+  @IsNotEmpty()
+  message?: string;
+}
 
 @Controller()
 class DynamicController {
@@ -18,6 +34,27 @@ class DynamicController {
   @Get('error')
   getError() {
     throw new InternalServerErrorException('General error');
+  }
+
+  // Cookie test methods
+  @Get('set-cookie')
+  setCookie(@Res() res: Response) {
+    res.cookie('test', 'NestJS').send('Cookie is set');
+  }
+
+  @Get('read-cookie')
+  readCookie(@Req() req: Request) {
+    return req.cookies['test'] || 'No cookie found';
+  }
+
+  @Get('cors-test')
+  getCorsTest() {
+    return { message: 'CORS is enabled' };
+  }
+
+  @Post('validate')
+  validateTest(@Body() testDto: TestDTO) {
+    return testDto;
   }
 }
 
@@ -97,5 +134,46 @@ describe('app.controller test', () => {
           throw new Error('Expected text not found in response');
         }
       });
+  });
+
+  it('should set and read a cookie', async () => {
+    await request(testModule.app.getHttpServer())
+      .get('/set-cookie')
+      .expect((res) => {
+        expect(res.headers['set-cookie']).toContainEqual(
+          expect.stringContaining(`test=NestJS`),
+        );
+      });
+
+    await request(testModule.app.getHttpServer())
+      .get('/read-cookie')
+      .set('Cookie', [`test=NestJS`])
+      .expect(HttpStatus.OK)
+      .expect('NestJS');
+  });
+
+  it('should include security headers', async () => {
+    await request(testModule.app.getHttpServer())
+      .get('/some-path')
+      .expect((res) => {
+        expect(res.headers['x-dns-prefetch-control']).toBeDefined();
+        expect(res.headers['x-frame-options']).toBeDefined();
+      });
+  });
+
+  it('should handle request validation', async () => {
+    const invalidPayload = {
+      email: 'not-an-email',
+    };
+
+    const response = await request(testModule.app.getHttpServer())
+      .post('/validate')
+      .send(invalidPayload)
+      .expect(HttpStatus.BAD_REQUEST);
+
+    expect(response.body).toMatchObject({
+      statusCode: HttpStatus.BAD_REQUEST,
+      path: '/validate',
+    });
   });
 });
