@@ -29,9 +29,11 @@
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/serve-static": "^4.0.1",
     "@nestjs/terminus": "^10.2.3",
+    "@ntegral/nestjs-sentry": "^4.0.1",
     "@octokit/core": "^5.1.0",
     "@octokit/plugin-rest-endpoint-methods": "^10.4.0",
     "@octokit/rest": "^20.0.2",
+    "@sentry/node": "^7.106.0",
     "@slack/bolt": "^3.16.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
@@ -51,6 +53,12 @@
   "overrides": {
     "eslint-config-standard-with-typescript": {
       "@typescript-eslint/eslint-plugin": "^7.0.0"
+    },
+    "@ntegral/nestjs-sentry": {
+      "reflect-metadata": "^0.2.1"
+    },
+    "@probot/pino": {
+      "@sentry/node": "7.106.0"
     },
     "axios": "1.6.7",
     "ip": "2.0.1"

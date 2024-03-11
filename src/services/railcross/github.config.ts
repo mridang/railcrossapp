@@ -1,12 +1,9 @@
-import {
-  GetSecretValueCommand,
-  GetSecretValueResponse,
-  SecretsManagerClient,
-} from '@aws-sdk/client-secrets-manager';
+import { SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import path from 'path';
 import fs from 'fs';
 import dotenv from 'dotenv';
+import getSecret from '../../utils/secrets';
 
 @Injectable()
 export default class GithubConfig {
@@ -42,50 +39,15 @@ export default class GithubConfig {
       };
     } else {
       this.logger.log(`Reading configuration from secrets manager.`);
-
-      const command: GetSecretValueCommand = new GetSecretValueCommand({
-        SecretId: secretName,
-      });
-
-      const data: GetSecretValueResponse = (await this.client.send(
-        command,
-      )) as GetSecretValueResponse;
-      if (data.SecretString) {
-        const {
-          APP_ID,
-          CLIENT_ID,
-          CLIENT_SECRET,
-          PRIVATE_KEY,
-          WEBHOOK_SECRET,
-        } = JSON.parse(data.SecretString);
-        return {
-          appId: APP_ID,
-          clientId: CLIENT_ID,
-          clientSecret: CLIENT_SECRET,
-          privateKey: PRIVATE_KEY.replaceAll('&', '\n'),
-          secret: WEBHOOK_SECRET,
-        };
-      } else {
-        if (data.SecretBinary) {
-          const buff = GithubConfig.decoder.decode(data.SecretBinary);
-          const {
-            APP_ID,
-            CLIENT_ID,
-            CLIENT_SECRET,
-            PRIVATE_KEY,
-            WEBHOOK_SECRET,
-          } = JSON.parse(buff.toString());
-          return {
-            appId: APP_ID,
-            clientId: CLIENT_ID,
-            clientSecret: CLIENT_SECRET,
-            privateKey: PRIVATE_KEY.replaceAll('&', '\n'),
-            secret: WEBHOOK_SECRET,
-          };
-        } else {
-          throw new Error();
-        }
-      }
+      const { APP_ID, CLIENT_ID, CLIENT_SECRET, PRIVATE_KEY, WEBHOOK_SECRET } =
+        JSON.parse(await getSecret(secretName, this.client));
+      return {
+        appId: APP_ID,
+        clientId: CLIENT_ID,
+        clientSecret: CLIENT_SECRET,
+        privateKey: PRIVATE_KEY.replaceAll('&', '\n'),
+        secret: WEBHOOK_SECRET,
+      };
     }
   }
 }
