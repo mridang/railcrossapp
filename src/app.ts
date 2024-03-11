@@ -40,6 +40,7 @@ export default function configure(nestApp: NestExpressApplication) {
           property: error.property,
           constraints: error.constraints,
         }));
+        console.log(messages);
         return new BadRequestException(messages);
       },
     }),
