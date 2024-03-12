@@ -14,7 +14,6 @@ export class AuthMiddleware implements NestMiddleware {
   }
 
   use(request: Request, response: Response, next: NextFunction) {
-    console.log(request.headers);
     const token = request.cookies ? request.cookies['jwt'] : undefined;
     if (!token) {
       const state = 'randomStringToPreventCSRF';
