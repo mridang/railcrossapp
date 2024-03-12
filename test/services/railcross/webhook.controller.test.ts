@@ -4,8 +4,8 @@ import { HttpStatus } from '@nestjs/common';
 import { End2EndModule } from '../../e2e.module';
 import { AppModule } from '../../../src/app.module';
 import { createHmac } from 'node:crypto';
-import GithubConfig from '../../../src/services/railcross/github.config';
 import { secretName } from '../../../src/constants';
+import GithubConfig from '../../../src/services/github/github.config';
 
 const testModule = new End2EndModule({
   imports: [

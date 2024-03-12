@@ -11,10 +11,12 @@ import getSecret from './utils/secrets';
 import { secretName } from './constants';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { RailcrossModule } from './services/railcross/railcross.module';
+import { GithubModule } from './services/github/github.module';
 
 @Global()
 @Module({
   imports: [
+    GithubModule,
     RailcrossModule,
     HttpModule,
     TerminusModule,

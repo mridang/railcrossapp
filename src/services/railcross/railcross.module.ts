@@ -5,16 +5,17 @@ import SchedulerService from './scheduler.service';
 import { roleName, scheduleGroup, secretName } from '../../constants';
 import { createProbot } from 'probot';
 import RailcrossProbot from './probot.handler';
+import ProbotHandler from './probot.handler';
 import { SchedulerClient } from '@aws-sdk/client-scheduler';
-import GithubConfig from './github.config';
 import { Octokit } from '@octokit/rest';
 import { createAppAuth } from '@octokit/auth-app';
 import { SetupController } from './setup.controller';
 import RailcrossService from './railcross.service';
-import ProbotHandler from './probot.handler';
 import { retry } from '@octokit/plugin-retry';
 import path from 'path';
 import { SecretsManagerClient } from '@aws-sdk/client-secrets-manager';
+import GithubConfig from '../github/github.config';
+import { GithubModule } from '../github/github.module';
 
 const MyOctokit = Octokit.plugin(retry);
 
@@ -35,7 +36,6 @@ const MyOctokit = Octokit.plugin(retry);
         return new SecretsManagerClient();
       },
     },
-    GithubConfig,
     {
       inject: [GithubConfig, ProbotHandler],
       provide: 'PROBOT',
@@ -96,6 +96,7 @@ const MyOctokit = Octokit.plugin(retry);
       },
     },
   ],
+  imports: [GithubModule],
   exports: [
     //
   ],

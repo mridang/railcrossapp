@@ -4,12 +4,15 @@ import {
   Controller,
   Get,
   Post,
-  Query,
   Render,
+  Req,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { IsInt, Max, Min } from 'class-validator';
 import { IsSupportedTimeZone } from './timezone.validator';
 import RailcrossService from './railcross.service';
+import { AuthService } from '../github/auth.service';
+import { Request } from 'express';
 
 class ScheduleDto {
   @IsInt()
@@ -29,38 +32,59 @@ class ScheduleDto {
   timezone!: string;
 }
 
-@Controller('setup')
+@Controller('app')
 export class SetupController {
-  constructor(private readonly railcrossService: RailcrossService) {
+  constructor(
+    private readonly authService: AuthService,
+    private readonly railcrossService: RailcrossService,
+  ) {
     //
   }
 
-  @Get()
+  @Get('setup')
   @Render('setup')
-  showSetup(@Query('installation_id') installationId: string) {
-    if (!installationId) {
-      throw new Error('installation_id query parameter is required');
-    }
+  async showSetup() {
+    // noinspection TypeScriptUnresolvedReference
+    // @ts-expect-error since
+    const accessToken: string = request.user.accessToken;
+    if (!accessToken) {
+      throw new UnauthorizedException('Unable to deduce allowed installations');
+    } else {
+      const userRepos =
+        await this.authService.listReposWithInstallations(accessToken);
 
-    return {
-      timezones: Intl.supportedValuesOf('timeZone'),
-      installationId,
-    };
+      return {
+        timezones: Intl.supportedValuesOf('timeZone'),
+        installationIds: userRepos
+          .map((userRepo) => userRepo.installationId)
+          .filter((value, index, self) => self.indexOf(value) === index),
+      };
+    }
   }
 
-  @Post()
-  async updateSetup(@Body() scheduleDto: ScheduleDto) {
-    if (scheduleDto.lock_time <= scheduleDto.unlock_time) {
-      throw new BadRequestException('Lock time must be after unlock time.');
+  @Post('setup')
+  async updateSetup(@Body() scheduleDto: ScheduleDto, @Req() request: Request) {
+    // noinspection TypeScriptUnresolvedReference
+    // @ts-expect-error since
+    const installationIds: number[] = request.user.installationIds;
+    if (!installationIds.includes(scheduleDto.installation_id)) {
+      throw new UnauthorizedException('Unable to deduce allowed installations');
+    } else {
+      if (scheduleDto.lock_time <= scheduleDto.unlock_time) {
+        throw new BadRequestException('Lock time must be after unlock time.');
+      }
+
+      await this.railcrossService.updateSchedules(
+        scheduleDto.installation_id,
+        scheduleDto.lock_time,
+        scheduleDto.unlock_time,
+        scheduleDto.timezone,
+      );
+
+      return {
+        message: 'Schedule created successfully',
+        schedule: scheduleDto,
+      };
     }
-
-    await this.railcrossService.updateSchedules(
-      scheduleDto.installation_id,
-      scheduleDto.lock_time,
-      scheduleDto.unlock_time,
-      scheduleDto.timezone,
-    );
-
-    return { message: 'Schedule created successfully', schedule: scheduleDto };
   }
 }

@@ -1,13 +1,13 @@
 import { expect } from '@jest/globals';
 import {
-  SecretsManagerClient,
   CreateSecretCommand,
+  SecretsManagerClient,
 } from '@aws-sdk/client-secrets-manager';
 import { TextEncoder } from 'util';
+import GithubConfig from '../../../src/services/github/github.config';
 import { join } from 'path';
 import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import GithubConfig from '../../../src/services/railcross/github.config';
 
 describe('github.config tests', () => {
   const secretsManagerClient = new SecretsManagerClient({
