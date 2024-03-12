@@ -8,7 +8,6 @@ import getSecret from '../../utils/secrets';
 @Injectable()
 export default class GithubConfig {
   private readonly logger = new Logger(GithubConfig.name);
-  private static readonly decoder = new TextDecoder('utf8');
 
   constructor(
     @Inject('ENV_PATH')

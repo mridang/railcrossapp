@@ -1,11 +1,14 @@
 /* eslint-disable no-console */
 import path from 'path';
-import { DockerComposeEnvironment } from 'testcontainers';
+import {
+  DockerComposeEnvironment,
+  StartedDockerComposeEnvironment,
+} from 'testcontainers';
 import { config } from 'dotenv';
 
 declare global {
-  // eslint-disable-next-line
-  var DOCKER: any;
+  // noinspection ES6ConvertVarToLetConst
+  var DOCKER: StartedDockerComposeEnvironment; // eslint-disable-line no-var
 }
 
 config();
