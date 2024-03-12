@@ -23,24 +23,26 @@ describe('auth.controller tests', () => {
   });
 
   beforeEach(() => {
+    nock('https://api.github.com')
+      .persist()
+      .get('/user/installations?per_page=100')
+      .reply(200, [{ id: 123 }, { id: 456 }])
+      .get('/user')
+      .reply(200, {
+        login: 'testuser',
+      })
+      .get('/user/repos?per_page=100')
+      .reply(200, [
+        { full_name: 'testuser/repo1', archived: false },
+        { full_name: 'testuser/repo2', archived: true },
+      ]);
+
     nock('https://github.com')
       .persist()
       .post('/login/oauth/access_token')
       .reply(200, {
         access_token: 'test_access_token',
       });
-
-    nock('https://api.github.com').persist().get('/user').reply(200, {
-      login: 'testuser',
-    });
-
-    nock('https://api.github.com')
-      .persist()
-      .get('/user/repos?per_page=100')
-      .reply(200, [
-        { full_name: 'testuser/repo1', archived: false },
-        { full_name: 'testuser/repo2', archived: true },
-      ]);
   });
 
   afterEach(() => {
