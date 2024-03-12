@@ -3,6 +3,7 @@ import {
   Catch,
   ExceptionFilter,
   HttpException,
+  HttpStatus,
   Logger,
 } from '@nestjs/common';
 import { HttpArgumentsHost } from '@nestjs/common/interfaces';
@@ -46,7 +47,7 @@ export class CustomHttpExceptionFilter implements ExceptionFilter {
 
       this.showError(status, host.switchToHttp());
     } else {
-      this.showError(500, host.switchToHttp());
+      this.showError(HttpStatus.INTERNAL_SERVER_ERROR, host.switchToHttp());
     }
   }
 

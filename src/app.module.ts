@@ -1,4 +1,4 @@
-import { Global, HttpException, Module } from '@nestjs/common';
+import { Global, HttpException, HttpStatus, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { ConfigModule } from '@nestjs/config';
 import path, { join } from 'path';
@@ -67,7 +67,8 @@ import { GithubModule } from './services/github/github.module';
           filters: [
             {
               type: HttpException,
-              filter: (exception: HttpException) => 500 > exception.getStatus(),
+              filter: (exception: HttpException) =>
+                HttpStatus.INTERNAL_SERVER_ERROR > exception.getStatus(),
             },
           ],
         }),
