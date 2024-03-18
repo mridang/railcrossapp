@@ -45,8 +45,6 @@ const MyOctokit = Octokit.plugin(retry);
       ) => {
         const secret = await githubConfig.getSecret(secretName);
 
-        console.log("moo")
-        console.log(secret)
         const probot = createProbot({
           overrides: {
             ...secret,
