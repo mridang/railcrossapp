@@ -44,7 +44,8 @@
     "helmet": "^7.1.0",
     "murmurhash": "^2.0.1",
     "probot": "^12.3.3",
-    "reflect-metadata": "^0.2.1"
+    "reflect-metadata": "^0.2.1",
+    "@lifeomic/axios-fetch": "^3.0.1"
   },
   "engines": {
     "node": "20.x"
@@ -66,7 +67,6 @@
     "ip": "2.0.1"
   },
   "devDependencies": {
-    "@lifeomic/axios-fetch": "^3.0.1",
     "@nestjs/cli": "^10.3.2",
     "@nestjs/testing": "^10.3.3",
     "@serverless/typescript": "^3.38.0",
