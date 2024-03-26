@@ -17,6 +17,26 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: ./docker_images
+          key: ${{ runner.os }}-docker-${{ hashFiles('docker-compose.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-docker-
+
+      - name: Docker pull
+        run: |
+          mkdir -p ./docker_images
+          docker compose -f docker-compose.yml config --images | while IFS= read -r IMAGE; do
+          FILENAME=$(echo -n "$IMAGE" | sha256sum | cut -d' ' -f1).tar
+          if [ ! -f "./docker_images/$FILENAME" ]; then
+           docker pull "$IMAGE"
+           docker save "$IMAGE" -o "./docker_images/$FILENAME"
+          fi
+          docker load -i "./docker_images/$FILENAME"
+          done
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
