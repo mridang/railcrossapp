@@ -10,6 +10,7 @@ import { HttpArgumentsHost } from '@nestjs/common/interfaces';
 import { Response } from 'express';
 import * as fs from 'fs';
 import * as path from 'path';
+import { isObject } from '@nestjs/common/utils/shared.utils';
 
 @Catch()
 export class CustomHttpExceptionFilter implements ExceptionFilter {
@@ -47,6 +48,11 @@ export class CustomHttpExceptionFilter implements ExceptionFilter {
 
       this.showError(status, host.switchToHttp());
     } else {
+      if (this.isExceptionObject(exception)) {
+        this.logger.error(exception.message, exception.stack);
+      } else {
+        this.logger.error(exception);
+      }
       this.showError(HttpStatus.INTERNAL_SERVER_ERROR, host.switchToHttp());
     }
   }
@@ -68,6 +74,11 @@ export class CustomHttpExceptionFilter implements ExceptionFilter {
         path: ctx.getRequest().url,
       });
     }
+  }
+
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  public isExceptionObject(err: any): err is Error {
+    return isObject(err) && !!(err as Error).message;
   }
 
   /**
