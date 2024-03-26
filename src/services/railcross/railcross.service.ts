@@ -3,6 +3,7 @@ import { RestEndpointMethods } from '@octokit/plugin-rest-endpoint-methods/dist-
 import { Api } from '@octokit/plugin-rest-endpoint-methods/dist-types/types';
 import { Octokit } from '@octokit/rest';
 import SchedulerService from './scheduler.service';
+import { ensure } from '../../utils/ensure';
 
 @Injectable()
 export default class RailcrossService {
@@ -16,6 +17,33 @@ export default class RailcrossService {
     //
   }
 
+  async listSchedules(
+    repoName: string,
+  ): Promise<{ repoName: string; lockTime?: string; unlockTime?: string }> {
+    const schedules = await this.schedulerService.listSchedules(repoName);
+    const unlockTime = schedules
+      .filter((schedule) => schedule.Name?.endsWith('-unlock'))
+      .map(
+        (schedule) =>
+          `${schedule.ScheduleExpression} ${schedule.ScheduleExpressionTimezone}`,
+      )
+      .pop();
+
+    const lockTime = schedules
+      .filter((schedule) => schedule.Name?.endsWith('-lock'))
+      .map(
+        (schedule) =>
+          `${schedule.ScheduleExpression} ${schedule.ScheduleExpressionTimezone}`,
+      )
+      .pop();
+
+    return {
+      repoName: repoName,
+      lockTime: ensure(lockTime),
+      unlockTime: ensure(unlockTime),
+    };
+  }
+
   async updateSchedules(
     installationId: number,
     lockTime: number,
@@ -23,9 +51,15 @@ export default class RailcrossService {
     timeZone: string,
   ) {
     const octokit = this.octokitFn(installationId);
-    const { data } =
-      await octokit.rest.apps.listReposAccessibleToInstallation();
-    for (const repo of data.repositories) {
+    const installation = await octokit.paginate(
+      octokit.rest.apps.listReposAccessibleToInstallation,
+      {
+        per_page: 100,
+      },
+    );
+
+    // @ts-expect-error since the types are missing
+    for (const repo of installation) {
       await this.schedulerService.updateSchedules(
         installationId,
         repo.full_name,

@@ -43,7 +43,7 @@ export class SetupController {
 
   @Get('setup')
   @Render('setup')
-  async showSetup() {
+  async showSetup(@Req() request: Request) {
     // noinspection TypeScriptUnresolvedReference
     // @ts-expect-error since
     const accessToken: string = request.user.accessToken;
@@ -53,8 +53,17 @@ export class SetupController {
       const userRepos =
         await this.authService.listReposWithInstallations(accessToken);
 
+      const repoSchedules = await Promise.all(
+        userRepos.map(async (userRepo) => {
+          return await this.railcrossService.listSchedules(
+            userRepo.ownerRepo.fullName,
+          );
+        }),
+      );
+
       return {
         timezones: Intl.supportedValuesOf('timeZone'),
+        repoSchedules,
         installationIds: userRepos
           .map((userRepo) => userRepo.installationId)
           .filter((value, index, self) => self.indexOf(value) === index),

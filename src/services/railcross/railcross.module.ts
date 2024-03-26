@@ -59,7 +59,9 @@ const MyOctokit = Octokit.plugin(retry);
     {
       provide: 'SCHEDULER_CLIENT',
       useFactory: () => {
-        return new SchedulerClient();
+        return new SchedulerClient({
+          maxAttempts: 10,
+        });
       },
     },
     {
