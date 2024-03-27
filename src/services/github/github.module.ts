@@ -83,7 +83,7 @@ export class GithubModule implements NestModule {
     consumer
       .apply((req: Request, res: Response, next: NextFunction) => {
         const domain: string = ensure(
-          req.headers['x-forwarded-host'] || req.headers['host'],
+          process.env.DOMAIN_NAME || req.headers['host'],
         ) as string;
         const middlewareInstance = new AuthMiddleware(
           this.jwtService,

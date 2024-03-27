@@ -3,6 +3,10 @@ import { AwsLambdaRuntime } from '@serverless/typescript';
 import packageJson from './package.json';
 import { roleName, scheduleGroup, secretName } from './src/constants';
 
+const parentDomain = process.env.PARENT_DOMAIN;
+const hostedZoneId = process.env.HOSTED_ZONE_ID;
+const fullDomainName = `${packageJson.name}.${parentDomain}`;
+
 const serverlessConfiguration: AWS = {
   service: packageJson.name,
   frameworkVersion: '3',
@@ -35,6 +39,7 @@ const serverlessConfiguration: AWS = {
       ACCOUNT_ID: '${aws:accountId}',
       NODE_ENV: '${self:provider.stage}',
       SERVICE_NAME: packageJson.name,
+      DOMAIN_NAME: fullDomainName,
     },
     name: 'aws',
     logRetentionInDays: 14,
@@ -159,6 +164,104 @@ const serverlessConfiguration: AWS = {
   },
   resources: {
     Resources: {
+      SiteCertificate: {
+        Type: 'AWS::CertificateManager::Certificate',
+        Properties: {
+          DomainName: fullDomainName,
+          ValidationMethod: 'DNS',
+        },
+      },
+      CloudFrontDistribution: {
+        Type: 'AWS::CloudFront::Distribution',
+        Properties: {
+          DistributionConfig: {
+            Enabled: true,
+            PriceClass: 'PriceClass_All',
+            HttpVersion: 'http2',
+            IPV6Enabled: true,
+            Origins: [
+              {
+                Id: 'LambdaOrigin',
+                DomainName: {
+                  'Fn::GetAtt': ['ProbotLambdaFunctionUrl', 'FunctionUrl'],
+                },
+                CustomOriginConfig: {
+                  HTTPSPort: 443,
+                  OriginProtocolPolicy: 'https-only',
+                },
+              },
+            ],
+            DefaultCacheBehavior: {
+              TargetOriginId: 'LambdaOrigin',
+              ViewerProtocolPolicy: 'redirect-to-https',
+              AllowedMethods: [
+                'GET',
+                'HEAD',
+                'OPTIONS',
+                'PUT',
+                'PATCH',
+                'POST',
+                'DELETE',
+              ],
+              CachedMethods: ['GET', 'HEAD'],
+              CachePolicyId: '658327ea-f89d-4fab-a63d-7e88639e58f6',
+              OriginRequestPolicyId: '216adef6-5c7f-47e4-b989-5492eafa07d3',
+              Compress: true,
+            },
+            CacheBehaviors: [
+              {
+                PathPattern: '/static/*',
+                TargetOriginId: 'LambdaOrigin',
+                ViewerProtocolPolicy: 'redirect-to-https',
+                AllowedMethods: ['GET', 'HEAD', 'OPTIONS'],
+                CachedMethods: ['GET', 'HEAD'],
+                CachePolicyId: '4135ea2d-6df8-44a3-9df3-4b5a84be39ad',
+                Compress: true,
+              },
+            ],
+            Aliases: [fullDomainName],
+            ViewerCertificate: {
+              AcmCertificateArn: {
+                Ref: 'SiteCertificate',
+              },
+              SslSupportMethod: 'sni-only',
+              MinimumProtocolVersion: 'TLSv1.2_2018',
+            },
+          },
+        },
+      },
+      DNSRecordForCloudFront: {
+        Type: 'AWS::Route53::RecordSetGroup',
+        Properties: {
+          HostedZoneId: hostedZoneId,
+          RecordSets: [
+            {
+              Name: fullDomainName,
+              Type: 'A',
+              AliasTarget: {
+                HostedZoneId: 'Z2FDTNDATAQYW2', // CloudFront's Hosted Zone ID
+                DNSName: {
+                  'Fn::GetAtt': ['CloudFrontDistribution', 'DomainName'],
+                },
+                EvaluateTargetHealth: true,
+              },
+              Failover: 'PRIMARY',
+            },
+            {
+              Name: fullDomainName,
+              Type: 'AAAA',
+              AliasTarget: {
+                HostedZoneId: 'Z2FDTNDATAQYW2', // CloudFront's Hosted Zone ID
+                DNSName: {
+                  'Fn::GetAtt': ['CloudFrontDistribution', 'DomainName'],
+                },
+                EvaluateTargetHealth: true,
+              },
+              Failover: 'PRIMARY',
+            },
+          ],
+        },
+      },
       RailcrossSchedulerRole: {
         Type: 'AWS::IAM::Role',
         Properties: {
