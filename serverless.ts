@@ -37,6 +37,7 @@ const serverlessConfiguration: AWS = {
       SERVICE_NAME: packageJson.name,
     },
     name: 'aws',
+    logRetentionInDays: 14,
     tracing: {
       lambda: true,
     },
