@@ -27,15 +27,17 @@ jobs:
 
       - name: Docker pull
         run: |
-          mkdir -p ./docker_images
-          docker compose -f docker-compose.yml config --images | while IFS= read -r IMAGE; do
-          FILENAME=$(echo -n "$IMAGE" | sha256sum | cut -d' ' -f1).tar
-          if [ ! -f "./docker_images/$FILENAME" ]; then
-           docker pull "$IMAGE"
-           docker save "$IMAGE" -o "./docker_images/$FILENAME"
+          IMAGES_DIR="./docker_images"
+          COMBINED_IMAGES_TAR="$IMAGES_DIR/combined_images.tar"
+          
+          if [ -f "$COMBINED_IMAGES_TAR" ]; then
+          docker image load -i "$COMBINED_IMAGES_TAR"
+          else
+          mkdir -p "$IMAGES_DIR"
+          IMAGES=$(docker compose config --images)
+          docker pull $IMAGES
+          docker image save -o "$COMBINED_IMAGES_TAR" $IMAGES
           fi
-          docker load -i "./docker_images/$FILENAME"
-          done
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
