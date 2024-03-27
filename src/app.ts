@@ -10,7 +10,11 @@ import { BadRequestException, ValidationPipe } from '@nestjs/common';
 export default function configure(nestApp: NestExpressApplication) {
   nestApp.useGlobalFilters(new CustomHttpExceptionFilter());
   nestApp.setViewEngine('hbs');
-  nestApp.setBaseViewsDir(join(__dirname, '..', 'views'));
+  nestApp.setBaseViewsDir(
+    fs.existsSync(join(__dirname, 'views'))
+      ? join(__dirname, 'views')
+      : join(__dirname, '..', 'views'),
+  );
   nestApp.engine(
     'hbs',
     (
