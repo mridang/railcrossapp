@@ -93,6 +93,21 @@ const serverlessConfiguration: AWS = {
           },
           {
             Effect: 'Allow',
+            Action: 'scheduler:GetSchedule',
+            Resource: {
+              'Fn::Join': [
+                ':',
+                [
+                  'arn:aws:scheduler',
+                  { Ref: 'AWS::Region' },
+                  { Ref: 'AWS::AccountId' },
+                  'schedule/railcross-lock-unlock-schedules/*',
+                ],
+              ],
+            },
+          },
+          {
+            Effect: 'Allow',
             Action: 'scheduler:DeleteSchedule',
             Resource: {
               'Fn::Join': [
