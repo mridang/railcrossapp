@@ -25,6 +25,19 @@ export default class SchedulerService {
     @Inject('SCHEDULER_ROLE')
     private readonly schedulerRoleArn: string = `arn:aws:iam::${process.env.ACCOUNT_ID}:role/${roleName}`,
   ) {
+    if (process.env.AWS_REGION === undefined) {
+      throw new Error(
+        'Expected AWS_REGION environment variable is not defined',
+      );
+    }
+    if (process.env.ACCOUNT_ID === undefined) {
+      throw new Error(
+        'Expected ACCOUNT_ID environment variable is not defined',
+      );
+    }
+    if (process.env.NODE_ENV === undefined) {
+      throw new Error('Expected NODE_ENV environment variable is not defined');
+    }
     this.logger.log(`Scheduler will use role ${this.schedulerRoleArn}`);
   }
 
