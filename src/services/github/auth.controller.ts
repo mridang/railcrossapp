@@ -13,7 +13,6 @@ import { Octokit } from '@octokit/rest';
 import { Response } from 'express';
 import GithubConfig from './github.config';
 import { secretName } from '../../constants';
-import packageJson from '../../../package.json';
 import { IsString, Length } from 'class-validator';
 import murmurhash from 'murmurhash';
 import { buildAxiosFetch } from '@lifeomic/axios-fetch';
@@ -85,7 +84,9 @@ export class AuthController {
       },
       {
         subject: currentUser.data.login,
-        issuer: packageJson.name,
+        issuer:
+          // eslint-disable-next-line @typescript-eslint/no-var-requires
+          process.env.SERVICE_NAME || require('../../../package.json').name,
         audience: repoList
           .filter((repo) => !repo.archived)
           .map((repo) => repo.full_name)
