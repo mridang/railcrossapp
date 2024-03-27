@@ -183,7 +183,20 @@ const serverlessConfiguration: AWS = {
               {
                 Id: 'LambdaOrigin',
                 DomainName: {
-                  'Fn::GetAtt': ['ProbotLambdaFunctionUrl', 'FunctionUrl'],
+                  'Fn::Select': [
+                    2,
+                    {
+                      'Fn::Split': [
+                        '/',
+                        {
+                          'Fn::GetAtt': [
+                            'ProbotLambdaFunctionUrl',
+                            'FunctionUrl',
+                          ],
+                        },
+                      ],
+                    },
+                  ],
                 },
                 CustomOriginConfig: {
                   HTTPSPort: 443,
