@@ -16,6 +16,7 @@ import { AuthController } from './auth.controller';
 import { HttpModule } from '@nestjs/axios';
 import { AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
+import { ensure } from '../../utils/ensure';
 
 const MyOctokit = Octokit.plugin(retry);
 
@@ -81,10 +82,13 @@ export class GithubModule implements NestModule {
     const appSecrets = await this.githubConfig.getSecret(secretName);
     consumer
       .apply((req: Request, res: Response, next: NextFunction) => {
+        const domain: string = ensure(
+          req.headers['x-forwarded-host'] || req.headers['host'],
+        ) as string;
         const middlewareInstance = new AuthMiddleware(
           this.jwtService,
           appSecrets.clientId,
-          'https://marhsall.loca.lt/auth',
+          `https://${domain}/auth`,
         );
         middlewareInstance.use(req, res, next);
       })
