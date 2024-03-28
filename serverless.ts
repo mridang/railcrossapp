@@ -177,7 +177,7 @@ const serverlessConfiguration: AWS = {
           DistributionConfig: {
             Enabled: true,
             PriceClass: 'PriceClass_All',
-            HttpVersion: 'http2',
+            HttpVersion: 'http2and3',
             IPV6Enabled: true,
             Origins: [
               {
@@ -238,7 +238,7 @@ const serverlessConfiguration: AWS = {
                 Ref: 'SiteCertificate',
               },
               SslSupportMethod: 'sni-only',
-              MinimumProtocolVersion: 'TLSv1.2_2018',
+              MinimumProtocolVersion: 'TLSv1.2_2021',
             },
           },
         },
