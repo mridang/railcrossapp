@@ -60,7 +60,8 @@ describe('setup.controller test', () => {
         )}`,
       )
       .send(scheduleDto)
-      .expect(HttpStatus.CREATED);
+      .expect(HttpStatus.FOUND)
+      .expect('Location', '/app/setup');
 
     expect(railcrossServiceMock.updateSchedules).toHaveBeenCalledTimes(1);
     expect(railcrossServiceMock.updateSchedules).toHaveBeenCalledWith(

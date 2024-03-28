@@ -3,7 +3,9 @@ import {
   Body,
   Controller,
   Get,
+  HttpStatus,
   Post,
+  Redirect,
   Render,
   Req,
   UnauthorizedException,
@@ -72,6 +74,7 @@ export class SetupController {
   }
 
   @Post('setup')
+  @Redirect('/app/setup', HttpStatus.FOUND)
   async updateSetup(@Body() scheduleDto: ScheduleDto, @Req() request: Request) {
     // noinspection TypeScriptUnresolvedReference
     // @ts-expect-error since
@@ -89,11 +92,6 @@ export class SetupController {
         scheduleDto.unlock_time,
         scheduleDto.timezone,
       );
-
-      return {
-        message: 'Schedule created successfully',
-        schedule: scheduleDto,
-      };
     }
   }
 }
