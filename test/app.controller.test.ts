@@ -162,18 +162,27 @@ describe('app.controller test', () => {
   });
 
   it('should handle request validation', async () => {
-    const invalidPayload = {
-      email: 'not-an-email',
-    };
-
     const response = await request(testModule.app.getHttpServer())
       .post('/validate')
-      .send(invalidPayload)
+      .send({
+        email: 'not-an-email',
+      })
       .expect(HttpStatus.BAD_REQUEST);
 
     expect(response.body).toMatchObject({
       statusCode: HttpStatus.BAD_REQUEST,
       path: '/validate',
     });
+  });
+
+  it('should disallow all crawling', async () => {
+    await request(testModule.app.getHttpServer())
+      .get('/robots.txt')
+      .expect('Content-Type', /text\/plain/)
+      .expect(200)
+      .then((response) => {
+        expect(response.text).toContain('User-agent: *');
+        expect(response.text).toContain('Disallow: /');
+      });
   });
 });

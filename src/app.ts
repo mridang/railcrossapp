@@ -6,6 +6,7 @@ import fs from 'fs';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
+import { Request, Response } from 'express';
 
 export default function configure(nestApp: NestExpressApplication) {
   nestApp.useGlobalFilters(new CustomHttpExceptionFilter());
@@ -28,6 +29,10 @@ export default function configure(nestApp: NestExpressApplication) {
     },
   );
 
+  nestApp.use('/robots.txt', (req: Request, res: Response) => {
+    res.type('text/plain');
+    res.send('User-agent: *\nDisallow: /');
+  });
   nestApp.use(cookieParser());
   nestApp.use(helmet());
   nestApp.enableCors();
