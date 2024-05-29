@@ -6,7 +6,8 @@ import fs from 'fs';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import serverTiming from 'server-timing';
 
 export default function configure(nestApp: NestExpressApplication) {
   nestApp.useGlobalFilters(new CustomHttpExceptionFilter());
@@ -33,6 +34,15 @@ export default function configure(nestApp: NestExpressApplication) {
     res.type('text/plain');
     res.send('User-agent: *\nDisallow: /');
   });
+  nestApp.use((req: Request, res: Response, next: NextFunction) => {
+    res.setHeader(
+      'X-Lambda-Start',
+      process.env.LAMBDA_COLD_START === 'warm' ? 'Warm' : 'Cold',
+    );
+    process.env.LAMBDA_COLD_START = 'warm';
+    next();
+  });
+  nestApp.use(serverTiming());
   nestApp.use(cookieParser());
   nestApp.use(helmet());
   nestApp.enableCors();
