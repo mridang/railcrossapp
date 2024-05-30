@@ -12,12 +12,17 @@ import { secretName } from './constants';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { RailcrossModule } from './services/railcross/railcross.module';
 import { GithubModule } from './services/github/github.module';
+import { ClsModule } from 'nestjs-cls';
+import { PowertoolsLoggerService } from './app.logger';
 
 @Global()
 @Module({
   imports: [
     GithubModule,
     RailcrossModule,
+    ClsModule.forRoot({
+      global: true,
+    }),
     HttpModule,
     TerminusModule,
     SentryModule.forRootAsync({
@@ -56,6 +61,7 @@ import { GithubModule } from './services/github/github.module';
   ],
   controllers: [AppController],
   providers: [
+    PowertoolsLoggerService,
     {
       provide: 'ENV_PATH',
       useValue: process.env.ENV_PATH || path.resolve(process.cwd(), '.env'),

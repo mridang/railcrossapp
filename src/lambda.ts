@@ -11,6 +11,8 @@ import {
 import { AppModule } from './app.module';
 import { PowertoolsLoggerService } from './app.logger';
 import configure from './app';
+import { AsyncLocalStorage } from 'node:async_hooks';
+import { ClsService } from 'nestjs-cls';
 
 let cachedServer: Handler;
 
@@ -19,7 +21,9 @@ async function bootstrap() {
     const nestApp = await NestFactory.create<NestExpressApplication>(
       AppModule,
       {
-        logger: new PowertoolsLoggerService(),
+        logger: new PowertoolsLoggerService(
+          new ClsService(new AsyncLocalStorage()),
+        ),
         rawBody: true,
       },
     );

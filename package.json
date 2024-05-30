@@ -44,6 +44,7 @@
     "hbs": "^4.2.0",
     "helmet": "^7.1.0",
     "murmurhash": "^2.0.1",
+    "nestjs-cls": "^4.3.0",
     "probot": "^12.3.3",
     "reflect-metadata": "^0.2.1",
     "server-timing": "^3.3.3"
