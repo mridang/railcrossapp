@@ -1,6 +1,8 @@
 import { expect } from '@jest/globals';
 import { Logger } from '@aws-lambda-powertools/logger';
 import { PowertoolsLoggerService } from '../src/app.logger';
+import { ClsService } from 'nestjs-cls';
+import { AsyncLocalStorage } from 'node:async_hooks';
 
 // Mock the Logger from @aws-lambda-powertools/logger
 jest.mock('@aws-lambda-powertools/logger', () => {
@@ -23,7 +25,9 @@ describe('app.logger tests', () => {
   beforeEach(() => {
     // Reset the module so we get a fresh instance
     jest.resetModules();
-    loggerService = new PowertoolsLoggerService();
+    loggerService = new PowertoolsLoggerService(
+      new ClsService(new AsyncLocalStorage()),
+    );
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     logger = (loggerService as any).logger;
   });
