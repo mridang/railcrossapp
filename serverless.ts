@@ -164,6 +164,17 @@ const serverlessConfiguration: AWS = {
   },
   resources: {
     Resources: {
+      LambdaOriginAccessControl: {
+        Type: 'AWS::CloudFront::OriginAccessControl',
+        Properties: {
+          OriginAccessControlConfig: {
+            Name: 'LambdaOAC',
+            OriginAccessControlOriginType: 'lambda',
+            SigningBehavior: 'always',
+            SigningProtocol: 'sigv4',
+          },
+        },
+      },
       SiteCertificate: {
         Type: 'AWS::CertificateManager::Certificate',
         Properties: {
@@ -328,6 +339,28 @@ const serverlessConfiguration: AWS = {
             WEBHOOK_SECRET: '',
             PRIVATE_KEY: '',
           }),
+        },
+      },
+      ProbotLambdaPermissionFnUrl: {
+        Type: 'AWS::Lambda::Permission',
+        Properties: {
+          FunctionName: {
+            'Fn::GetAtt': ['ProbotLambdaFunction', 'Arn'],
+          },
+          Action: 'lambda:InvokeFunctionUrl',
+          Principal: '*',
+          FunctionUrlAuthType: 'NONE',
+          SourceArn: {
+            'Fn::Join': [
+              '',
+              [
+                'arn:aws:cloudfront::',
+                { Ref: 'AWS::AccountId' },
+                ':distribution/',
+                { Ref: 'CloudFrontDistribution' },
+              ],
+            ],
+          },
         },
       },
     },
