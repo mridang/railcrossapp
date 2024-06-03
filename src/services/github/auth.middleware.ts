@@ -1,4 +1,4 @@
-import { HttpStatus, Logger, NestMiddleware } from '@nestjs/common';
+import { Logger, NestMiddleware, UnauthorizedException } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
 import { JwtService } from '@nestjs/jwt';
 
@@ -27,9 +27,7 @@ export class AuthMiddleware implements NestMiddleware {
         next();
       } catch (error) {
         this.logger.error(`Tampered JWT with value ${token} found`);
-        return response
-          .status(HttpStatus.UNAUTHORIZED)
-          .send({ message: 'Invalid token.' });
+        throw new UnauthorizedException('Invalid token.');
       }
     }
   }
