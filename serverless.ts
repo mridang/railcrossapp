@@ -10,7 +10,10 @@ const fullDomainName = `${packageJson.name}.${parentDomain}`;
 const serverlessConfiguration: AWS = {
   service: packageJson.name,
   frameworkVersion: '3',
-  plugins: ['serverless-plugin-typescript'],
+  plugins: [
+    'serverless-plugin-typescript',
+    '@mridang/serverless-checkov-plugin',
+  ],
   package: {
     individually: false,
     patterns: [
