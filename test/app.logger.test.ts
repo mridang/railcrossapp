@@ -36,7 +36,7 @@ describe('app.logger tests', () => {
     const message = 'Test message';
     const context = 'TestContext';
     loggerService.log(message, context);
-    expect(logger.info).toHaveBeenCalledWith('TestContext: Test message');
+    expect(logger.info).toHaveBeenCalledWith('TestContext: Test message', {});
   });
 
   it('should log an error message correctly', () => {
@@ -53,14 +53,20 @@ describe('app.logger tests', () => {
     const message = 'Warning message';
     const context = 'WarningContext';
     loggerService.warn(message, context);
-    expect(logger.warn).toHaveBeenCalledWith('WarningContext: Warning message');
+    expect(logger.warn).toHaveBeenCalledWith(
+      'WarningContext: Warning message',
+      {},
+    );
   });
 
   it('should log a debug message correctly', () => {
     const message = 'Debug message';
     const context = 'DebugContext';
     loggerService.debug(message, context);
-    expect(logger.debug).toHaveBeenCalledWith('DebugContext: Debug message');
+    expect(logger.debug).toHaveBeenCalledWith(
+      'DebugContext: Debug message',
+      {},
+    );
   });
 
   it('should log a verbose message correctly using debug method', () => {
@@ -70,6 +76,7 @@ describe('app.logger tests', () => {
     loggerService.verbose(message, context);
     expect(logger.debug).toHaveBeenCalledWith(
       'VerboseContext: Verbose message',
+      {},
     );
   });
 });
