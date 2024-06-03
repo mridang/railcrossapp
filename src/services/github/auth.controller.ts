@@ -41,7 +41,7 @@ export class AuthController {
   @Get('/')
   @UsePipes(new ValidationPipe({ transform: true }))
   async handleGitHubCallback(
-    @Res() response: Response,
+    @Res({ passthrough: true }) response: Response,
     @Query() dto: CallbackDto,
   ) {
     const appSecret = await this.githubConfig.getSecret(secretName);
@@ -106,7 +106,7 @@ export class AuthController {
   }
 
   @Get('/logout')
-  logout(@Res() res: Response) {
+  logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('jwt', {
       httpOnly: true,
       secure: true,
