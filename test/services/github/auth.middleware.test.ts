@@ -1,7 +1,7 @@
 import { expect } from '@jest/globals';
 import { NextFunction, Request, Response } from 'express';
 import { AuthMiddleware } from '../../../src/services/github/auth.middleware';
-import { HttpStatus } from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 describe('auth.middleware tests', () => {
@@ -61,14 +61,12 @@ describe('auth.middleware tests', () => {
       cookies: { jwt: 'invalidToken' },
     };
 
-    middleware.use(
-      mockRequest as Request,
-      mockResponse as Response,
-      nextFunction,
-    );
-    expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.UNAUTHORIZED);
-    expect(mockResponse.send).toHaveBeenCalledWith({
-      message: 'Invalid token.',
-    });
+    expect(() => {
+      middleware.use(
+        mockRequest as Request,
+        mockResponse as Response,
+        nextFunction,
+      );
+    }).toThrow(new UnauthorizedException('Invalid token.'));
   });
 });
