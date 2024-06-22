@@ -7,10 +7,8 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import { BadRequestException, ValidationPipe } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
-import { PowertoolsLoggerService } from './app.logger';
 
 export default function configure(nestApp: NestExpressApplication) {
-  nestApp.useLogger(nestApp.get(PowertoolsLoggerService));
   nestApp.useGlobalFilters(new CustomHttpExceptionFilter());
   nestApp.setViewEngine('hbs');
   nestApp.setBaseViewsDir(
