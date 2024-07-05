@@ -1,7 +1,6 @@
-import { RestEndpointMethods } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/method-types';
-import { Api } from '@octokit/plugin-rest-endpoint-methods/dist-types/types';
 import { Octokit } from '@octokit/rest';
 import { Inject, Injectable, Logger } from '@nestjs/common';
+import { ensure } from '../../utils/ensure';
 
 @Injectable()
 export default class ProtectionService {
@@ -9,9 +8,7 @@ export default class ProtectionService {
 
   constructor(
     @Inject('GITHUB_FN')
-    private readonly octokitFn: (
-      installationId: number,
-    ) => RestEndpointMethods & Api & Octokit,
+    private readonly octokitFn: (installationId: number) => Octokit,
   ) {
     //
   }
@@ -76,7 +73,7 @@ export default class ProtectionService {
                     ) || [],
                   apps:
                     required_pull_request_reviews?.dismissal_restrictions?.apps?.map(
-                      (app) => app.name,
+                      (app) => ensure(app?.name),
                     ) || [],
                 }
               : undefined,
@@ -99,7 +96,7 @@ export default class ProtectionService {
                     ) || [],
                   apps:
                     required_pull_request_reviews?.bypass_pull_request_allowances?.apps?.map(
-                      (app) => app.name,
+                      (app) => ensure(app?.name),
                     ) || [],
                 }
               : undefined,
