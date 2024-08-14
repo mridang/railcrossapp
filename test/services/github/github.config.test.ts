@@ -19,7 +19,7 @@ describe('github.config tests', () => {
     },
   });
 
-  it('should read secrets from SecretString', async () => {
+  test('should read secrets from SecretString', async () => {
     const githubConfig: GithubConfig = new GithubConfig(
       './.env.test',
       secretsManagerClient,
@@ -50,7 +50,7 @@ describe('github.config tests', () => {
     });
   });
 
-  it('should read secrets from .env file', async () => {
+  test('should read secrets from .env file', async () => {
     const envPath = join(mkdtempSync(join(tmpdir(), 'githubConfig-')), '.env');
     const envContent = `
 APP_ID=appIdFromEnv
@@ -74,7 +74,7 @@ WEBHOOK_SECRET=webhookSecretFromEnv
     });
   });
 
-  it('should read secrets from SecretBinary', async () => {
+  test('should read secrets from SecretBinary', async () => {
     const githubConfig: GithubConfig = new GithubConfig(
       './.env.test',
       secretsManagerClient,

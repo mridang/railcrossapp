@@ -24,7 +24,7 @@ describe('correlation.middleware test', () => {
     });
   });
 
-  it('should parse the request and set the context correctly', () => {
+  test('should parse the request and set the context correctly', () => {
     const nextFn: jest.Mock = jest.fn();
 
     middleware.use(

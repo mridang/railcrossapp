@@ -4,7 +4,7 @@ import { handler } from '../src/lambda';
 import { HttpStatus } from '@nestjs/common';
 
 describe('Lambda Handler', () => {
-  it('should log output on /health route', async () => {
+  test('should log output on /health route', async () => {
     const context: Partial<Context> = {
       functionName: 'testFunction',
     };

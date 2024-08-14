@@ -10,7 +10,7 @@ describe('auth.middleware tests', () => {
   const redirectUri = 'http://localhost/callback';
   const middleware = new AuthMiddleware(jwtService, clientId, redirectUri);
 
-  it('should redirect if no JWT cookie found', () => {
+  test('should redirect if no JWT cookie found', () => {
     const nextFunction: NextFunction = jest.fn();
     const mockResponse: Partial<Response> = {
       redirect: jest.fn(),
@@ -31,7 +31,7 @@ describe('auth.middleware tests', () => {
     );
   });
 
-  it('should call next if valid JWT token is provided', () => {
+  test('should call next if valid JWT token is provided', () => {
     const nextFunction: NextFunction = jest.fn();
     const mockResponse: Partial<Response> = {
       redirect: jest.fn(),
@@ -50,7 +50,7 @@ describe('auth.middleware tests', () => {
     expect(nextFunction).toHaveBeenCalled();
   });
 
-  it('should return 401 if invalid JWT token is provided', () => {
+  test('should return 401 if invalid JWT token is provided', () => {
     const nextFunction: NextFunction = jest.fn();
     const mockResponse: Partial<Response> = {
       redirect: jest.fn(),

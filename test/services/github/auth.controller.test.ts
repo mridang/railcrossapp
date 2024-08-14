@@ -49,19 +49,19 @@ describe('auth.controller tests', () => {
     nock.cleanAll();
   });
 
-  it('responds with 400 Bad Request when `code` query parameter is missing', () => {
+  test('responds with 400 Bad Request when `code` query parameter is missing', () => {
     return request(testModule.app.getHttpServer())
       .get('/auth')
       .expect(HttpStatus.BAD_REQUEST);
   });
 
-  it('responds with 400 Bad Request when `code` query parameter is invalid', () => {
+  test('responds with 400 Bad Request when `code` query parameter is invalid', () => {
     return request(testModule.app.getHttpServer())
       .get('/auth?code=invalidCode')
       .expect(HttpStatus.BAD_REQUEST);
   });
 
-  it('handles GitHub OAuth callback successfully', () => {
+  test('handles GitHub OAuth callback successfully', () => {
     return request(testModule.app.getHttpServer())
       .get('/auth?code=foofoofoofoofoofoofoo&state=barbarbarbarbarbarbar')
       .expect(HttpStatus.FOUND)
@@ -71,7 +71,7 @@ describe('auth.controller tests', () => {
       );
   });
 
-  it('clears jwt cookie and redirects on logout', () => {
+  test('clears jwt cookie and redirects on logout', () => {
     return request(testModule.app.getHttpServer())
       .get('/auth/logout')
       .expect(HttpStatus.FOUND)

@@ -8,7 +8,7 @@ describe('auth.guard tests', () => {
   const jwtService = new JwtService({ secret: 'test' });
   const authGuard = new AuthGuard(jwtService);
 
-  it('should disallow access when no cookies are present', () => {
+  test('should disallow access when no cookies are present', () => {
     const fakeContext: ExecutionContext = {
       switchToHttp: () => ({
         // @ts-expect-error since
@@ -24,7 +24,7 @@ describe('auth.guard tests', () => {
     expect(authGuard.canActivate(fakeContext)).toBe(false);
   });
 
-  it('should disallow access when the cookie is not present', () => {
+  test('should disallow access when the cookie is not present', () => {
     const fakeContext: ExecutionContext = {
       switchToHttp: () => ({
         // @ts-expect-error since
@@ -41,7 +41,7 @@ describe('auth.guard tests', () => {
     expect(authGuard.canActivate(fakeContext)).toBe(false);
   });
 
-  it('should disallow access with a malformed JWT token', () => {
+  test('should disallow access with a malformed JWT token', () => {
     const fakeContext: ExecutionContext = {
       switchToHttp: () => ({
         // @ts-expect-error since
@@ -58,7 +58,7 @@ describe('auth.guard tests', () => {
     expect(authGuard.canActivate(fakeContext)).toBe(false);
   });
 
-  it('should disallow access with a valid JWT token but missing aud', () => {
+  test('should disallow access with a valid JWT token but missing aud', () => {
     const fakeContext: ExecutionContext = {
       switchToHttp: () => ({
         // @ts-expect-error since
@@ -75,7 +75,7 @@ describe('auth.guard tests', () => {
     expect(authGuard.canActivate(fakeContext)).toBe(false);
   });
 
-  it('should disallow access with a valid JWT token but incorrect aud', () => {
+  test('should disallow access with a valid JWT token but incorrect aud', () => {
     const fakeContext: ExecutionContext = {
       switchToHttp: () => ({
         // @ts-expect-error since
@@ -99,7 +99,7 @@ describe('auth.guard tests', () => {
     expect(authGuard.canActivate(fakeContext)).toBe(false);
   });
 
-  it('should disallow access with a valid JWT token but incorrect aud', () => {
+  test('should disallow access with a valid JWT token but incorrect aud', () => {
     const fakeContext: ExecutionContext = {
       switchToHttp: () => ({
         // @ts-expect-error since
@@ -123,7 +123,7 @@ describe('auth.guard tests', () => {
     expect(authGuard.canActivate(fakeContext)).toBe(false);
   });
 
-  it('should disallow access with a valid JWT token and incorrect aud', () => {
+  test('should disallow access with a valid JWT token and incorrect aud', () => {
     const fakeContext: ExecutionContext = {
       switchToHttp: () => ({
         // @ts-expect-error since
@@ -147,7 +147,7 @@ describe('auth.guard tests', () => {
     expect(authGuard.canActivate(fakeContext)).toBe(false);
   });
 
-  it('should sallow access with a valid JWT token and correct aud', () => {
+  test('should sallow access with a valid JWT token and correct aud', () => {
     const fakeContext: ExecutionContext = {
       switchToHttp: () => ({
         // @ts-expect-error since

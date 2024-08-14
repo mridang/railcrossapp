@@ -25,7 +25,7 @@ describe('webhook.controller test', () => {
     await testModule.afterAll();
   });
 
-  it('should return 201 when the headers all valid', async () => {
+  test('should return 201 when the headers all valid', async () => {
     const webhookSecret = await testModule.app
       .get(GithubConfig)
       .getSecret(secretName);
@@ -65,7 +65,7 @@ describe('webhook.controller test', () => {
       });
   });
 
-  it('should return 400 without x-github-delivery header', async () => {
+  test('should return 400 without x-github-delivery header', async () => {
     const webhookSecret = await testModule.app
       .get(GithubConfig)
       .getSecret(secretName);
@@ -94,7 +94,7 @@ describe('webhook.controller test', () => {
       .expect(HttpStatus.BAD_REQUEST);
   });
 
-  it('should return 400 without x-github-event header', async () => {
+  test('should return 400 without x-github-event header', async () => {
     const webhookSecret = await testModule.app
       .get(GithubConfig)
       .getSecret(secretName);
@@ -123,7 +123,7 @@ describe('webhook.controller test', () => {
       .expect(HttpStatus.BAD_REQUEST);
   });
 
-  it('should return 400 without x-hub-signature-256 header', async () => {
+  test('should return 400 without x-hub-signature-256 header', async () => {
     const webhookSecret = await testModule.app
       .get(GithubConfig)
       .getSecret(secretName);

@@ -115,51 +115,51 @@ describe('CustomLoggerService', () => {
     });
   }
 
-  it('should log info messages to the console in JSON format', () => {
+  test('should log info messages to the console in JSON format', () => {
     testLog('log', 'info', 'Test log message');
   });
 
-  it('should log info messages with an error to the console in JSON format', () => {
+  test('should log info messages with an error to the console in JSON format', () => {
     testLog('log', 'info', 'Test log message', 'baz', sampleError, {
       foo: 'bar',
     });
   });
 
-  it('should log debug messages to the console in JSON format', () => {
+  test('should log debug messages to the console in JSON format', () => {
     testLog('debug', 'debug', 'Test debug message');
   });
 
-  it('should log debug messages with an error to the console in JSON format', () => {
+  test('should log debug messages with an error to the console in JSON format', () => {
     testLog('debug', 'debug', 'Test debug message', 'baz', sampleError, {
       foo: 'bar',
     });
   });
 
-  it('should log verbose messages to the console in JSON format', () => {
+  test('should log verbose messages to the console in JSON format', () => {
     testLog('verbose', 'verbose', 'Test verbose message');
   });
 
-  it('should log verbose messages with an error to the console in JSON format', () => {
+  test('should log verbose messages with an error to the console in JSON format', () => {
     testLog('verbose', 'verbose', 'Test verbose message', 'baz', sampleError, {
       foo: 'bar',
     });
   });
 
-  it('should log error messages to the console in JSON format', () => {
+  test('should log error messages to the console in JSON format', () => {
     testLog('error', 'error', 'Test error message');
   });
 
-  it('should log error messages with an error to the console in JSON format', () => {
+  test('should log error messages with an error to the console in JSON format', () => {
     testLog('error', 'error', 'Test error message', 'baz', sampleError, {
       foo: 'bar',
     });
   });
 
-  it('should log warning messages to the console in JSON format', () => {
+  test('should log warning messages to the console in JSON format', () => {
     testLog('warn', 'warn', 'Test warn message');
   });
 
-  it('should log warning messages to the console in JSON format', () => {
+  test('should log warning messages to the console in JSON format', () => {
     testLog('warn', 'warn', 'Test warn message', 'baz', sampleError, {
       foo: 'bar',
     });

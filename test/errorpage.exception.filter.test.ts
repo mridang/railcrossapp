@@ -9,7 +9,7 @@ describe('CustomHttpExceptionFilter without mocks', () => {
     filter = new CustomHttpExceptionFilter();
   });
 
-  it('should send a HTML response when text/html is accepted', () => {
+  test('should send a HTML response when text/html is accepted', () => {
     // noinspection JSUnusedGlobalSymbols
     const response = {
       status: function (statusCode: number) {
@@ -41,7 +41,7 @@ describe('CustomHttpExceptionFilter without mocks', () => {
     );
   });
 
-  it('should send a JSON response when text/html is not accepted', () => {
+  test('should send a JSON response when text/html is not accepted', () => {
     // noinspection JSUnusedGlobalSymbols
     const response = {
       status: function (statusCode: number) {

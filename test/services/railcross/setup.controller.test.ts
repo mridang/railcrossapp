@@ -33,7 +33,7 @@ describe('setup.controller test', () => {
     await testModule.afterAll();
   });
 
-  it('/POST setup should create schedule and invoke updateSchedules', async () => {
+  test('/POST setup should create schedule and invoke updateSchedules', async () => {
     const jwtService = testModule.app.get(JwtService);
     const scheduleDto = {
       lock_time: 22,
@@ -72,7 +72,7 @@ describe('setup.controller test', () => {
     );
   });
 
-  it('/POST setup with invalid body should return bad request and not invoke updateSchedules', async () => {
+  test('/POST setup with invalid body should return bad request and not invoke updateSchedules', async () => {
     const jwtService = testModule.app.get(JwtService);
     const scheduleDto = {
       lock_time: 2, // Invalid because lock_time <= unlock_time

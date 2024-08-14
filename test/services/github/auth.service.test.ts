@@ -31,7 +31,7 @@ describe('auth.service tests', () => {
     nock.cleanAll();
   });
 
-  it('listReposWithInstallations should return formatted repos with installations', async () => {
+  test('listReposWithInstallations should return formatted repos with installations', async () => {
     const authService = new AuthService(new HttpService());
     const result = await authService.listReposWithInstallations('token');
     expect(result).toEqual([
