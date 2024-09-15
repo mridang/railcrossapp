@@ -47,7 +47,7 @@ The application uses X-Ray for tracing and Cloudwatch for logging.
 The application is designed to be stateless and does not have any sort
 of persistence—this includes all ephemeral persistence, e.g. caches.
 
-<img src="https://github.com/mridang/railcross/assets/327432/96d7ce2a-162d-4899-b4ae-bae6e8662c47">
+<img alt="Architecture Diagram" src="https://github.com/user-attachments/assets/d0a74846-a068-4409-88a2-12a61b7f11bd">
 
 ## Developing
 
