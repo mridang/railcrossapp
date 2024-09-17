@@ -5,15 +5,7 @@ import SchedulerService from '../../../src/services/railcross/scheduler.service'
 describe('scheduler.service test', () => {
   test('that schedules are added"', async () => {
     const schedulerService = new SchedulerService(
-      new SchedulerClient({
-        endpoint: 'http://localhost:4566',
-        region: 'us-east-1',
-        tls: false,
-        credentials: {
-          accessKeyId: 'test',
-          secretAccessKey: 'test',
-        },
-      }),
+      new SchedulerClient(),
       'default',
     );
 
