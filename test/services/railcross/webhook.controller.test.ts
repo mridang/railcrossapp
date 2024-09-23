@@ -4,8 +4,7 @@ import { HttpStatus } from '@nestjs/common';
 import { End2EndModule } from '../../e2e.module';
 import { AppModule } from '../../../src/app.module';
 import { createHmac } from 'node:crypto';
-import { secretName } from '../../../src/constants';
-import GithubConfig from '../../../src/services/github/github.config';
+import { ConfigService } from '@nestjs/config';
 
 const testModule = new End2EndModule({
   imports: [
@@ -27,8 +26,8 @@ describe('webhook.controller test', () => {
 
   test('should return 201 when the headers all valid', async () => {
     const webhookSecret = await testModule.app
-      .get(GithubConfig)
-      .getSecret(secretName);
+      .get(ConfigService)
+      .getOrThrow('GITHUB_WEBHOOK_SECRET');
 
     const payload = {
       action: 'opened',
@@ -44,7 +43,7 @@ describe('webhook.controller test', () => {
         login: 'octocat',
       },
     };
-    const signature = createHmac('sha256', webhookSecret.secret)
+    const signature = createHmac('sha256', webhookSecret)
       .update(JSON.stringify(payload))
       .digest('hex');
 
@@ -67,8 +66,9 @@ describe('webhook.controller test', () => {
 
   test('should return 400 without x-github-delivery header', async () => {
     const webhookSecret = await testModule.app
-      .get(GithubConfig)
-      .getSecret(secretName);
+      .get(ConfigService)
+      .getOrThrow('GITHUB_WEBHOOK_SECRET');
+
     const payload = {
       action: 'opened',
       issue: { number: 1 },
@@ -79,7 +79,7 @@ describe('webhook.controller test', () => {
       },
       sender: { login: 'octocat' },
     };
-    const signature = createHmac('sha256', webhookSecret.secret)
+    const signature = createHmac('sha256', webhookSecret)
       .update(JSON.stringify(payload))
       .digest('hex');
 
@@ -96,8 +96,9 @@ describe('webhook.controller test', () => {
 
   test('should return 400 without x-github-event header', async () => {
     const webhookSecret = await testModule.app
-      .get(GithubConfig)
-      .getSecret(secretName);
+      .get(ConfigService)
+      .getOrThrow('GITHUB_WEBHOOK_SECRET');
+
     const payload = {
       action: 'opened',
       issue: { number: 1 },
@@ -108,7 +109,7 @@ describe('webhook.controller test', () => {
       },
       sender: { login: 'octocat' },
     };
-    const signature = createHmac('sha256', webhookSecret.secret)
+    const signature = createHmac('sha256', webhookSecret)
       .update(JSON.stringify(payload))
       .digest('hex');
 
@@ -125,8 +126,9 @@ describe('webhook.controller test', () => {
 
   test('should return 400 without x-hub-signature-256 header', async () => {
     const webhookSecret = await testModule.app
-      .get(GithubConfig)
-      .getSecret(secretName);
+      .get(ConfigService)
+      .getOrThrow('GITHUB_WEBHOOK_SECRET');
+
     const payload = {
       action: 'opened',
       issue: { number: 1 },
@@ -137,7 +139,7 @@ describe('webhook.controller test', () => {
       },
       sender: { login: 'octocat' },
     };
-    const signature = createHmac('sha256', webhookSecret.secret)
+    const signature = createHmac('sha256', webhookSecret)
       .update(JSON.stringify(payload))
       .digest('hex');
 

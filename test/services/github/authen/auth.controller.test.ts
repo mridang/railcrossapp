@@ -1,8 +1,11 @@
-import { End2EndModule } from '../../e2e.module';
-import { AppModule } from '../../../src/app.module';
+import { End2EndModule } from '../../../e2e.module';
+import { AppModule } from '../../../../src/app.module';
 import nock from 'nock';
 import request from 'supertest';
 import { HttpStatus } from '@nestjs/common';
+import { buildAxiosFetch } from '@lifeomic/axios-fetch';
+import axios from 'axios';
+import { CryptoImpl, FetchImpl } from '@mridang/nestjs-defaults';
 
 const testModule = new End2EndModule({
   imports: [
@@ -15,7 +18,18 @@ const testModule = new End2EndModule({
 
 describe('auth.controller tests', () => {
   beforeAll(async () => {
-    await testModule.beforeAll();
+    await testModule.beforeAll((testModule) => {
+      testModule
+        .overrideProvider(CryptoImpl)
+        .useValue({
+          randomUUID: () => '00000000-0000-0000-0000-000000000000',
+          getRandomValues: crypto.getRandomValues,
+        })
+        .overrideProvider(FetchImpl)
+        .useValue(buildAxiosFetch(axios.create()));
+
+      return testModule;
+    });
   });
 
   afterAll(async () => {
@@ -64,10 +78,11 @@ describe('auth.controller tests', () => {
   test('handles GitHub OAuth callback successfully', () => {
     return request(testModule.app.getHttpServer())
       .get('/auth?code=foofoofoofoofoofoofoo&state=barbarbarbarbarbarbar')
+      .set('Cookie', 'nonce=barbarbarbarbarbarbar')
       .expect(HttpStatus.FOUND)
       .expect(
         'Set-Cookie',
-        /^jwt=.*\..*\..*; Max-Age=3600; Path=\/; Expires=.* GMT; HttpOnly; Secure; SameSite=Strict$/,
+        /^nonce=; Path=\/; Expires=.* GMT,jwt=.*\..*\..*; Max-Age=3600; Path=\/; Expires=.* GMT; HttpOnly; Secure; SameSite=Strict$/,
       );
   });
 

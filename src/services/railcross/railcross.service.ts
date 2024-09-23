@@ -4,12 +4,13 @@ import { Api } from '@octokit/plugin-rest-endpoint-methods/dist-types/types';
 import { Octokit } from '@octokit/rest';
 import SchedulerService from './scheduler.service';
 import { ensure } from '../../utils/ensure';
+import { OctokitImpl } from '../github/octokit/types';
 
 @Injectable()
 export default class RailcrossService {
   constructor(
     private readonly schedulerService: SchedulerService,
-    @Inject('GITHUB_FN')
+    @Inject(OctokitImpl)
     private readonly octokitFn: (
       installationId: number,
     ) => RestEndpointMethods & Api & Octokit,

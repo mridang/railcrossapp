@@ -4,7 +4,7 @@ import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ClsService } from 'nestjs-cls';
 import { AsyncLocalStorage } from 'node:async_hooks';
-import { BetterLogger } from './logger';
+import { BetterLogger } from '@mridang/nestjs-defaults/dist/logger';
 
 exports.lock = async ({
   installation_id,

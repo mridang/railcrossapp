@@ -1,14 +1,12 @@
 import { expect } from '@jest/globals';
 import { NextFunction, Request, Response } from 'express';
-import { AuthMiddleware } from '../../../src/services/github/auth.middleware';
+import { AuthMiddleware } from '../../../../src/services/github/authen/auth.middleware';
 import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
 describe('auth.middleware tests', () => {
   const jwtService = new JwtService({ secret: 'test' });
-  const clientId = 'mcid';
-  const redirectUri = 'http://localhost/callback';
-  const middleware = new AuthMiddleware(jwtService, clientId, redirectUri);
+  const middleware = new AuthMiddleware(jwtService);
 
   test('should redirect if no JWT cookie found', () => {
     const nextFunction: NextFunction = jest.fn();
@@ -16,9 +14,12 @@ describe('auth.middleware tests', () => {
       redirect: jest.fn(),
       status: jest.fn().mockReturnThis(), // For chaining .send()
       send: jest.fn(),
+      cookie: jest.fn(),
     };
     const mockRequest: Partial<Request> = {
-      //
+      cookies: {
+        //
+      },
     };
 
     middleware.use(
@@ -26,9 +27,7 @@ describe('auth.middleware tests', () => {
       mockResponse as Response,
       nextFunction,
     );
-    expect(mockResponse.redirect).toHaveBeenCalledWith(
-      `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}&state=randomStringToPreventCSRF`,
-    );
+    expect(mockResponse.redirect).toHaveBeenCalledWith(`/auth/reauthenticate`);
   });
 
   test('should call next if valid JWT token is provided', () => {
@@ -37,9 +36,12 @@ describe('auth.middleware tests', () => {
       redirect: jest.fn(),
       status: jest.fn().mockReturnThis(), // For chaining .send()
       send: jest.fn(),
+      cookie: jest.fn(),
     };
     const mockRequest: Partial<Request> = {
-      cookies: { jwt: jwtService.sign({ id: 'user123' }) },
+      cookies: {
+        jwt: jwtService.sign({ id: 'user123' }),
+      },
     };
 
     middleware.use(
@@ -56,9 +58,12 @@ describe('auth.middleware tests', () => {
       redirect: jest.fn(),
       status: jest.fn().mockReturnThis(), // For chaining .send()
       send: jest.fn(),
+      cookie: jest.fn(),
     };
     const mockRequest: Partial<Request> = {
-      cookies: { jwt: 'invalidToken' },
+      cookies: {
+        jwt: 'invalidToken',
+      },
     };
 
     expect(() => {

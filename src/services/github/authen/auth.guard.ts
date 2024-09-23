@@ -11,6 +11,7 @@ import murmurhash from 'murmurhash';
 @Injectable()
 export class AuthGuard implements CanActivate {
   private readonly logger: Logger = new Logger(AuthGuard.name);
+
   constructor(private readonly jwtService: JwtService) {
     //
   }
@@ -40,7 +41,7 @@ export class AuthGuard implements CanActivate {
             this.logger.log(`${fullName} is not allowed in allowed audiences`);
             return false;
           }
-        } catch (error) {
+        } catch {
           return false; // Token verification failed
         }
       }

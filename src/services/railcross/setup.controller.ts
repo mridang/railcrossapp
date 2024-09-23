@@ -4,6 +4,7 @@ import {
   Controller,
   Get,
   HttpStatus,
+  Inject,
   Post,
   Redirect,
   Render,
@@ -13,8 +14,11 @@ import {
 import { IsInt, Max, Min } from 'class-validator';
 import { IsSupportedTimeZone } from './timezone.validator';
 import RailcrossService from './railcross.service';
-import { AuthService } from '../github/auth.service';
 import { Request } from 'express';
+import { from, mergeMap, map, toArray, lastValueFrom } from 'rxjs';
+import Repository from '../github/types';
+import { Octokit } from '@octokit/rest';
+import { OctokitImpl } from '../github/octokit/types';
 
 class ScheduleDto {
   @IsInt()
@@ -37,8 +41,11 @@ class ScheduleDto {
 @Controller('app')
 export class SetupController {
   constructor(
-    private readonly authService: AuthService,
     private readonly railcrossService: RailcrossService,
+    @Inject(OctokitImpl)
+    private readonly octokitFn: (
+      accessTokenOrInstallationId: number | string,
+    ) => Octokit,
   ) {
     //
   }
@@ -52,8 +59,39 @@ export class SetupController {
     if (!accessToken) {
       throw new UnauthorizedException('Unable to deduce allowed installations');
     } else {
-      const userRepos =
-        await this.authService.listReposWithInstallations(accessToken);
+      const octokit = this.octokitFn(accessToken);
+      const userRepos = await lastValueFrom(
+        from(
+          octokit.paginate(octokit.apps.listInstallationsForAuthenticatedUser, {
+            per_page: 100,
+          }),
+        ).pipe(
+          mergeMap((installations) =>
+            from(installations.map((installation) => installation.id)).pipe(
+              mergeMap((installationId) =>
+                from(
+                  octokit.paginate(
+                    octokit.apps.listInstallationReposForAuthenticatedUser,
+                    {
+                      per_page: 100,
+                      installation_id: installationId,
+                    },
+                  ),
+                ).pipe(
+                  map((repositories) =>
+                    repositories.repositories.map((repository) => ({
+                      ownerRepo: new Repository(repository.full_name),
+                      installationId,
+                    })),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          toArray(),
+          map((flattened) => flattened.flat()),
+        ),
+      );
 
       const repoSchedules = await Promise.all(
         userRepos.map(async (userRepo) => {

@@ -1,13 +1,14 @@
 import { Octokit } from '@octokit/rest';
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ensure } from '../../utils/ensure';
+import { OctokitImpl } from '../github/octokit/types';
 
 @Injectable()
 export default class ProtectionService {
   private readonly logger = new Logger(ProtectionService.name);
 
   constructor(
-    @Inject('GITHUB_FN')
+    @Inject(OctokitImpl)
     private readonly octokitFn: (installationId: number) => Octokit,
   ) {
     //
