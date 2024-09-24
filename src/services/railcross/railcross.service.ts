@@ -55,11 +55,11 @@ export default class RailcrossService {
 
     await lastValueFrom(
       from(
-        ((await octokit.paginate(
-          octokit.rest.apps.listReposAccessibleToInstallation
+        (await octokit.paginate(
+          octokit.rest.apps.listReposAccessibleToInstallation,
         )) as unknown as Awaited<
           ReturnType<typeof octokit.rest.apps.listReposAccessibleToInstallation>
-        >["data"]["repositories"])
+        >['data']['repositories'],
       ).pipe(
         mergeMap((repo) => {
           return from(
