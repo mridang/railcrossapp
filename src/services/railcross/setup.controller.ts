@@ -15,7 +15,7 @@ import { IsInt, Max, Min } from 'class-validator';
 import { IsSupportedTimeZone } from './timezone.validator';
 import RailcrossService from './railcross.service';
 import { Request } from 'express';
-import { from, mergeMap, map, toArray, lastValueFrom, tap } from 'rxjs';
+import { from, mergeMap, map, toArray, lastValueFrom } from 'rxjs';
 import Repository from '../github/types';
 import { Octokit } from '@octokit/rest';
 import { OctokitImpl } from '../github/octokit/types';

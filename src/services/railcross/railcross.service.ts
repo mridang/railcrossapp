@@ -3,8 +3,8 @@ import { RestEndpointMethods } from '@octokit/plugin-rest-endpoint-methods/dist-
 import { Api } from '@octokit/plugin-rest-endpoint-methods/dist-types/types';
 import { Octokit } from '@octokit/rest';
 import SchedulerService from './scheduler.service';
-import { ensure } from '../../utils/ensure';
 import { OctokitImpl } from '../github/octokit/types';
+import { lastValueFrom, mergeMap, from, toArray, tap } from 'rxjs';
 
 @Injectable()
 export default class RailcrossService {
@@ -52,22 +52,28 @@ export default class RailcrossService {
     timeZone: string,
   ) {
     const octokit = this.octokitFn(installationId);
-    const installation = await octokit.paginate(
-      octokit.rest.apps.listReposAccessibleToInstallation,
-      {
-        per_page: 100,
-      },
-    );
 
-    // @ts-expect-error since the types are missing
-    for (const repo of installation) {
-      await this.schedulerService.updateSchedules(
-        installationId,
-        repo.full_name,
-        lockTime,
-        unlockTime,
-        timeZone,
-      );
-    }
+    await lastValueFrom(
+      from(
+        ((await octokit.paginate(
+          octokit.rest.apps.listReposAccessibleToInstallation
+        )) as unknown as Awaited<
+          ReturnType<typeof octokit.rest.apps.listReposAccessibleToInstallation>
+        >["data"]["repositories"])
+      ).pipe(
+        mergeMap((repo) => {
+          return from(
+            this.schedulerService.updateSchedules(
+              installationId,
+              repo.full_name,
+              lockTime,
+              unlockTime,
+              timeZone,
+            ),
+          );
+        }),
+        toArray(),
+      ),
+    );
   }
 }
