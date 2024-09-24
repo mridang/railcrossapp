@@ -82,7 +82,7 @@ export class SetupController {
                   ),
                 ).pipe(
                   map((repositories) =>
-                    // @ts-ignore
+                    // @ts-expect-error
                     repositories.map((repository) => ({
                       ownerRepo: new Repository(repository.full_name),
                       installationId,

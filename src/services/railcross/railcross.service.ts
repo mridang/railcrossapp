@@ -4,7 +4,7 @@ import { Api } from '@octokit/plugin-rest-endpoint-methods/dist-types/types';
 import { Octokit } from '@octokit/rest';
 import SchedulerService from './scheduler.service';
 import { OctokitImpl } from '../github/octokit/types';
-import { lastValueFrom, mergeMap, from, toArray, tap } from 'rxjs';
+import { lastValueFrom, mergeMap, from, toArray } from 'rxjs';
 
 @Injectable()
 export default class RailcrossService {
