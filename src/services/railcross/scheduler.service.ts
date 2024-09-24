@@ -97,69 +97,63 @@ export default class SchedulerService {
     unlockTime: number,
     timeZone: string,
   ) {
-    try {
-      for await (const page of paginateListSchedules(
-        {
-          client: this.scheduler,
-          pageSize: 100,
-        },
-        {
-          GroupName: this.group,
-          NamePrefix: repoName.replace(/[^0-9a-zA-Z-_.]/g, '--'),
-          MaxResults: 100,
-        },
-      )) {
-        for (const schedule of page.Schedules || []) {
-          this.logger.log(
-            `Updating all schedules named ${schedule.Name}* in group ${this.group}`,
+    for await (const page of paginateListSchedules(
+      {
+        client: this.scheduler,
+        pageSize: 100,
+      },
+      {
+        GroupName: this.group,
+        NamePrefix: repoName.replace(/[^0-9a-zA-Z-_.]/g, '--'),
+        MaxResults: 100,
+      },
+    )) {
+      for (const schedule of page.Schedules || []) {
+        this.logger.log(
+          `Updating all schedules named ${schedule.Name}* in group ${this.group}`,
+        );
+        if (schedule.Name === undefined) {
+          throw new Error();
+        } else if (schedule.Name.includes('-lock')) {
+          await this.scheduler.send(
+            new UpdateScheduleCommand({
+              GroupName: this.group,
+              ScheduleExpressionTimezone: timeZone,
+              ScheduleExpression: `cron(0 ${lockTime} ? * * *)`,
+              FlexibleTimeWindow: { Mode: FlexibleTimeWindowMode.OFF },
+              Target: {
+                Arn: `arn:aws:lambda:${process.env.AWS_REGION}:${process.env.ACCOUNT_ID}:function:railcross-${process.env.NODE_ENV}-locker`,
+                RoleArn: this.schedulerRoleArn,
+                Input: JSON.stringify({
+                  repo_name: repoName,
+                  installation_id: installationId,
+                }),
+              },
+              Name: schedule.Name,
+            }),
           );
-          if (schedule.Name === undefined) {
-            console.log('mooodo');
-            throw new Error();
-          } else if (schedule.Name.includes('-lock')) {
-            await this.scheduler.send(
-              new UpdateScheduleCommand({
-                GroupName: this.group,
-                ScheduleExpressionTimezone: timeZone,
-                ScheduleExpression: `cron(0 ${lockTime} ? * * *)`,
-                FlexibleTimeWindow: { Mode: FlexibleTimeWindowMode.OFF },
-                Target: {
-                  Arn: `arn:aws:lambda:${process.env.AWS_REGION}:${process.env.ACCOUNT_ID}:function:railcross-${process.env.NODE_ENV}-locker`,
-                  RoleArn: this.schedulerRoleArn,
-                  Input: JSON.stringify({
-                    repo_name: repoName,
-                    installation_id: installationId,
-                  }),
-                },
-                Name: schedule.Name,
-              }),
-            );
-          } else if (schedule.Name.includes('-unlock')) {
-            await this.scheduler.send(
-              new UpdateScheduleCommand({
-                GroupName: this.group,
-                ScheduleExpressionTimezone: timeZone,
-                ScheduleExpression: `cron(0 ${unlockTime} ? * * *)`,
-                FlexibleTimeWindow: { Mode: FlexibleTimeWindowMode.OFF },
-                Target: {
-                  Arn: `arn:aws:lambda:${process.env.AWS_REGION}:${process.env.ACCOUNT_ID}:function:railcross-${process.env.NODE_ENV}-unlocker`,
-                  RoleArn: this.schedulerRoleArn,
-                  Input: JSON.stringify({
-                    repo_name: repoName,
-                    installation_id: installationId,
-                  }),
-                },
-                Name: schedule.Name,
-              }),
-            );
-          } else {
-            throw new Error();
-          }
+        } else if (schedule.Name.includes('-unlock')) {
+          await this.scheduler.send(
+            new UpdateScheduleCommand({
+              GroupName: this.group,
+              ScheduleExpressionTimezone: timeZone,
+              ScheduleExpression: `cron(0 ${unlockTime} ? * * *)`,
+              FlexibleTimeWindow: { Mode: FlexibleTimeWindowMode.OFF },
+              Target: {
+                Arn: `arn:aws:lambda:${process.env.AWS_REGION}:${process.env.ACCOUNT_ID}:function:railcross-${process.env.NODE_ENV}-unlocker`,
+                RoleArn: this.schedulerRoleArn,
+                Input: JSON.stringify({
+                  repo_name: repoName,
+                  installation_id: installationId,
+                }),
+              },
+              Name: schedule.Name,
+            }),
+          );
+        } else {
+          throw new Error();
         }
       }
-    } catch (eeeee) {
-      console.log(eeeee);
-      throw eeeee;
     }
   }
 
