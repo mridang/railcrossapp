@@ -40,8 +40,8 @@ export default class RailcrossService {
 
     return {
       repoName: repoName,
-      lockTime: ensure(lockTime),
-      unlockTime: ensure(unlockTime),
+      lockTime: lockTime,
+      unlockTime: unlockTime,
     };
   }
 

@@ -1,7 +1,7 @@
 import { FetchImpl } from '@mridang/nestjs-defaults';
 import { ConfigService, ConfigModule } from '@nestjs/config';
 import { createAppAuth } from '@octokit/auth-app';
-import { Octokit } from '@octokit/core';
+import { Octokit } from '@octokit/rest';
 import { Module } from '@nestjs/common';
 import { retry } from '@octokit/plugin-retry';
 import { OctokitImpl } from './types';
