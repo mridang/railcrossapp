@@ -53,7 +53,6 @@ export class SetupController {
   @Get('setup')
   @Render('setup')
   async showSetup(@Req() request: Request) {
-
     // noinspection TypeScriptUnresolvedReference
     // @ts-expect-error since
     const accessToken: string = request.user.accessToken;
@@ -63,9 +62,12 @@ export class SetupController {
       const octokit = this.octokitFn(accessToken);
       const userRepos = await lastValueFrom(
         from(
-          octokit.paginate(octokit.rest.apps.listInstallationsForAuthenticatedUser, {
-            per_page: 100,
-          }),
+          octokit.paginate(
+            octokit.rest.apps.listInstallationsForAuthenticatedUser,
+            {
+              per_page: 100,
+            },
+          ),
         ).pipe(
           mergeMap((installations) =>
             from(installations.map((installation) => installation.id)).pipe(
