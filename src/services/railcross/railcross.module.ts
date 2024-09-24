@@ -12,9 +12,10 @@ import RailcrossService from './railcross.service';
 import { GithubModule } from '../github/github.module';
 import { ConfigService } from '@nestjs/config';
 import { OctokitModule } from '../github/octokit/octokit.module';
+import { HomeController } from './home.controller';
 
 @Module({
-  controllers: [WebhookController, SetupController],
+  controllers: [WebhookController, SetupController, HomeController],
   providers: [
     ProtectionService,
     SchedulerService,
