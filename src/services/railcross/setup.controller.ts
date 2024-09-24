@@ -15,7 +15,7 @@ import { IsInt, Max, Min } from 'class-validator';
 import { IsSupportedTimeZone } from './timezone.validator';
 import RailcrossService from './railcross.service';
 import { Request } from 'express';
-import { from, mergeMap, map, toArray, lastValueFrom } from 'rxjs';
+import { from, mergeMap, map, toArray, lastValueFrom, tap } from 'rxjs';
 import Repository from '../github/types';
 import { Octokit } from '@octokit/rest';
 import { OctokitImpl } from '../github/octokit/types';
@@ -53,6 +53,7 @@ export class SetupController {
   @Get('setup')
   @Render('setup')
   async showSetup(@Req() request: Request) {
+
     // noinspection TypeScriptUnresolvedReference
     // @ts-expect-error since
     const accessToken: string = request.user.accessToken;
@@ -62,7 +63,7 @@ export class SetupController {
       const octokit = this.octokitFn(accessToken);
       const userRepos = await lastValueFrom(
         from(
-          octokit.paginate(octokit.apps.listInstallationsForAuthenticatedUser, {
+          octokit.paginate(octokit.rest.apps.listInstallationsForAuthenticatedUser, {
             per_page: 100,
           }),
         ).pipe(
@@ -71,7 +72,7 @@ export class SetupController {
               mergeMap((installationId) =>
                 from(
                   octokit.paginate(
-                    octokit.apps.listInstallationReposForAuthenticatedUser,
+                    octokit.rest.apps.listInstallationReposForAuthenticatedUser,
                     {
                       per_page: 100,
                       installation_id: installationId,
@@ -79,7 +80,8 @@ export class SetupController {
                   ),
                 ).pipe(
                   map((repositories) =>
-                    repositories.repositories.map((repository) => ({
+                    // @ts-ignore
+                    repositories.map((repository) => ({
                       ownerRepo: new Repository(repository.full_name),
                       installationId,
                     })),
