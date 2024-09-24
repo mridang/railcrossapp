@@ -14,10 +14,6 @@ export interface AuthModuleOptions {
   authTTL: number;
 }
 
-export interface AuthOptionsFactory {
-  createAuthModuleOptions(): Promise<AuthModuleOptions> | AuthModuleOptions;
-}
-
 export interface AuthModuleAsyncOptions<T>
   extends Pick<ModuleMetadata, 'imports'> {
   inject?: InjectionToken[];
