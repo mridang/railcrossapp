@@ -82,7 +82,7 @@ export class SetupController {
                   ),
                 ).pipe(
                   map((repositories) =>
-                    // @ts-expect-error
+                    // @ts-expect-error due to https://github.com/octokit/plugin-paginate-rest.js/issues/350
                     repositories.map((repository) => ({
                       ownerRepo: new Repository(repository.full_name),
                       installationId,
