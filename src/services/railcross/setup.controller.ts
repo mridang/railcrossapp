@@ -117,9 +117,10 @@ export class SetupController {
 
   @Post('setup')
   @Redirect('/app/setup', HttpStatus.FOUND)
-  async updateSetup(@Body() scheduleDto: ScheduleDto, @Req() request: Request) {
-    // noinspection TypeScriptUnresolvedReference
-    // @ts-expect-error since
+  async updateSetup(
+    @Body() scheduleDto: ScheduleDto,
+    @Req() request: Request & { user: { installationIds: number[] } },
+  ) {
     const installationIds: number[] = request.user.installationIds;
     if (!installationIds.includes(scheduleDto.installation_id)) {
       throw new UnauthorizedException('Unable to deduce allowed installations');
