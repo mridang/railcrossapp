@@ -1,9 +1,11 @@
 import {
   CreateScheduleCommand,
+  CreateScheduleGroupCommand,
   DeleteScheduleCommand,
   FlexibleTimeWindowMode,
   GetScheduleCommand,
   GetScheduleCommandOutput,
+  GetScheduleGroupCommand,
   ListSchedulesCommand,
   ListSchedulesCommandOutput,
   paginateListSchedules,
@@ -11,10 +13,10 @@ import {
   UpdateScheduleCommand,
 } from '@aws-sdk/client-scheduler';
 import { roleName, scheduleGroup } from '../../constants';
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 
 @Injectable()
-export default class SchedulerService {
+export default class SchedulerService implements OnModuleInit {
   private readonly logger = new Logger(SchedulerService.name);
 
   constructor(
@@ -38,7 +40,30 @@ export default class SchedulerService {
     if (process.env.NODE_ENV === undefined) {
       throw new Error('Expected NODE_ENV environment variable is not defined');
     }
+
     this.logger.log(`Scheduler will use role ${this.schedulerRoleArn}`);
+  }
+
+  async onModuleInit() {
+    try {
+      await this.scheduler.send(
+        new GetScheduleGroupCommand({ Name: this.group }),
+      );
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.name === 'ResourceNotFoundException'
+      ) {
+        this.logger.log(
+          `Schedule group "${this.group}" not found, creating it...`,
+        );
+        await this.scheduler.send(
+          new CreateScheduleGroupCommand({ Name: this.group }),
+        );
+      } else {
+        throw error;
+      }
+    }
   }
 
   async addLockSchedules(repoName: string, installationId: number) {
