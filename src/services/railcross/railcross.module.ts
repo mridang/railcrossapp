@@ -9,10 +9,12 @@ import RailcrossService from './railcross.service';
 import { GithubModule } from '../github/github.module';
 import { OctokitModule } from '../github/octokit/octokit.module';
 import { HomeController } from './home.controller';
+import ProbotHandler from './probot.handler';
 
 @Module({
   controllers: [SetupController, HomeController],
   providers: [
+    ProbotHandler,
     ProtectionService,
     SchedulerService,
     RailcrossService,
