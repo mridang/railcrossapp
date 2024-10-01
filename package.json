@@ -55,11 +55,7 @@
 		"@ntegral/nestjs-sentry": {
 			"reflect-metadata": "^0.2.1",
 			"@nestjs/graphql": "^12.1.1"
-		},
-		"@probot/pino": {
-			"@sentry/node": "7.106.0"
-		},
-		"ip": "2.0.1"
+		}
 	},
 	"devDependencies": {
 		"@aws-sdk/client-scheduler": "^3.511.0",
