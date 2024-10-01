@@ -3,7 +3,6 @@ import { ConfigService } from '@nestjs/config';
 import { AuthModule } from './authen/auth.module';
 import { OctokitModule } from './octokit/octokit.module';
 import { WebhookModule } from './webhook/webhook.module';
-import { WebhookHandler } from './webhook/webhook.interfaces';
 
 @Module({
   controllers: [
@@ -38,9 +37,7 @@ import { WebhookHandler } from './webhook/webhook.interfaces';
       inject: [ConfigService],
     }),
   ],
-  exports: [
-    WebhookModule
-  ],
+  exports: [WebhookModule],
 })
 export class GithubModule {
   //
