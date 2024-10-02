@@ -155,7 +155,7 @@ const serverlessConfiguration: AWS = {
                   'arn:aws:scheduler',
                   { Ref: 'AWS::Region' },
                   { Ref: 'AWS::AccountId' },
-                  'schedule/railcross-lock-unlock-schedules',
+                  'schedule-group/railcross-lock-unlock-schedules',
                 ],
               ],
             },
