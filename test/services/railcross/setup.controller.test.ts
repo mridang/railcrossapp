@@ -6,7 +6,10 @@ import RailcrossService from '../../../src/services/railcross/railcross.service'
 import request from 'supertest';
 import { JwtService } from '@nestjs/jwt';
 
-const railcrossServiceMock = { updateSchedules: jest.fn() };
+const railcrossServiceMock = {
+  updateSchedules: jest.fn(),
+  listSchedules: jest.fn(),
+};
 
 const testModule = new End2EndModule({
   imports: [
@@ -33,12 +36,34 @@ describe('setup.controller test', () => {
     await testModule.afterAll();
   });
 
+  test('that the setup page renders correctly', async () => {
+    const jwtService = testModule.app.get(JwtService);
+    railcrossServiceMock.listSchedules.mockResolvedValue([]);
+
+    await request(testModule.app.getHttpServer())
+      .get('/app')
+      .set(
+        'Cookie',
+        `jwt=${jwtService.sign(
+          {
+            installationIds: [1, 2],
+            accessToken: 'token',
+          },
+          {
+            subject: 'mridang',
+            issuer: 'jest',
+            audience: ['mridang/testing'],
+          },
+        )}`,
+      )
+      .expect(HttpStatus.OK);
+  });
+
   test('/POST setup should create schedule and invoke updateSchedules', async () => {
     const jwtService = testModule.app.get(JwtService);
     const scheduleDto = {
       lock_time: 22,
       unlock_time: 2,
-      installation_id: 1,
       timezone: 'Asia/Bangkok',
     };
     railcrossServiceMock.updateSchedules.mockResolvedValue(null); // Assuming updateSchedules doesn't return anything
@@ -61,11 +86,12 @@ describe('setup.controller test', () => {
       )
       .send(scheduleDto)
       .expect(HttpStatus.FOUND)
-      .expect('Location', '/app/setup');
+      .expect('Location', '/app');
 
     expect(railcrossServiceMock.updateSchedules).toHaveBeenCalledTimes(1);
     expect(railcrossServiceMock.updateSchedules).toHaveBeenCalledWith(
-      scheduleDto.installation_id,
+      expect.any(Object),
+      undefined,
       scheduleDto.lock_time,
       scheduleDto.unlock_time,
       scheduleDto.timezone,
@@ -75,10 +101,9 @@ describe('setup.controller test', () => {
   test('/POST setup with invalid body should return bad request and not invoke updateSchedules', async () => {
     const jwtService = testModule.app.get(JwtService);
     const scheduleDto = {
-      lock_time: 2, // Invalid because lock_time <= unlock_time
+      lock_time: 2,
       unlock_time: 22,
-      installation_id: 1,
-      timezone: 'UTC',
+      timezone: 'X',
     };
 
     await request(testModule.app.getHttpServer())

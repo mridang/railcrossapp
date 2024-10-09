@@ -1,79 +1,247 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { RestEndpointMethods } from '@octokit/plugin-rest-endpoint-methods/dist-types/generated/method-types';
-import { Api } from '@octokit/plugin-rest-endpoint-methods/dist-types/types';
+import { Injectable } from '@nestjs/common';
 import { Octokit } from '@octokit/rest';
 import SchedulerService from './scheduler.service';
-import { OctokitImpl } from '../github/octokit/types';
-import { lastValueFrom, mergeMap, from, toArray } from 'rxjs';
+import {
+  lastValueFrom,
+  mergeMap,
+  from,
+  forkJoin,
+  map,
+  toArray,
+  tap,
+  filter,
+} from 'rxjs';
+import { Logger } from 'testcontainers/build/common';
 
 @Injectable()
 export default class RailcrossService {
-  constructor(
-    private readonly schedulerService: SchedulerService,
-    @Inject(OctokitImpl)
-    private readonly octokitFn: (
-      installationId: number,
-    ) => RestEndpointMethods & Api & Octokit,
-  ) {
+  private readonly logger: Logger = new Logger(RailcrossService.name);
+
+  constructor(private readonly schedulerService: SchedulerService) {
     //
   }
 
-  async listSchedules(
-    repoName: string,
-  ): Promise<{ repoName: string; lockTime?: string; unlockTime?: string }> {
-    const schedules = await this.schedulerService.listSchedules(repoName);
-    const unlockTime = schedules
-      .filter((schedule) => schedule.Name?.endsWith('-unlock'))
-      .map(
-        (schedule) =>
-          `${schedule.ScheduleExpression} ${schedule.ScheduleExpressionTimezone}`,
-      )
-      .pop();
+  async listSchedules(userOctokit: Octokit): Promise<
+    {
+      installationId: number;
+      repoId: number;
+      repoName: string;
+      lockTime?: string;
+      unlockTime?: string;
+    }[]
+  > {
+    return await lastValueFrom(
+      from(
+        userOctokit.paginate(
+          userOctokit.rest.apps.listInstallationsForAuthenticatedUser,
+          { per_page: 100 },
+        ) as unknown as Awaited<
+          ReturnType<
+            typeof userOctokit.rest.apps.listInstallationsForAuthenticatedUser
+          >
+        >['data']['installations'][],
+      ).pipe(
+        mergeMap((installations) => from(installations)),
+        tap((installation) => {
+          this.logger.info(`Listing repositories for ${installation.id}`);
+        }),
+        mergeMap((installation) =>
+          from(
+            userOctokit.paginate(
+              userOctokit.rest.apps.listInstallationReposForAuthenticatedUser,
+              {
+                per_page: 100,
+                installation_id: installation.id,
+              },
+            ) as unknown as Awaited<
+              ReturnType<
+                typeof userOctokit.rest.apps.listInstallationReposForAuthenticatedUser
+              >
+            >['data']['repositories'][],
+          ).pipe(
+            mergeMap((repositories) => from(repositories)),
+            tap((repository) => {
+              this.logger.info(
+                `Fetching schedules for ${repository.full_name}`,
+              );
+            }),
+            mergeMap((repository) =>
+              forkJoin({
+                lock: from(
+                  this.schedulerService.getSchedule(
+                    installation.id,
+                    repository.id,
+                    'locker',
+                  ),
+                ),
+                unlock: from(
+                  this.schedulerService.getSchedule(
+                    installation.id,
+                    repository.id,
+                    'unlocker',
+                  ),
+                ),
+              }).pipe(
+                map(({ lock, unlock }) => ({
+                  installationId: installation.id,
+                  repoId: repository.id,
+                  updatedAt: repository.updated_at,
+                  repoName: repository.full_name,
+                  lockTime: lock
+                    ? `${lock.ScheduleExpression} ${lock.ScheduleExpressionTimezone}`
+                    : undefined,
+                  unlockTime: unlock
+                    ? `${unlock.ScheduleExpression} ${unlock.ScheduleExpressionTimezone}`
+                    : undefined,
+                })),
+              ),
+            ),
+            toArray(),
+            map((results) =>
+              results.sort(
+                (a, b) =>
+                  (b.updatedAt ? new Date(b.updatedAt).getTime() : -Infinity) -
+                  (a.updatedAt ? new Date(a.updatedAt).getTime() : -Infinity),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
-    const lockTime = schedules
-      .filter((schedule) => schedule.Name?.endsWith('-lock'))
-      .map(
-        (schedule) =>
-          `${schedule.ScheduleExpression} ${schedule.ScheduleExpressionTimezone}`,
+  async resetSchedules(userOctokit: Octokit): Promise<void> {
+    return await from(
+      userOctokit.paginate(
+        userOctokit.rest.apps.listInstallationsForAuthenticatedUser,
+        { per_page: 100 },
+      ) as unknown as Awaited<
+        ReturnType<
+          typeof userOctokit.rest.apps.listInstallationsForAuthenticatedUser
+        >
+      >['data']['installations'][],
+    )
+      .pipe(
+        mergeMap((installations) => from(installations)),
+        tap((installation) => {
+          this.logger.info(`Listing repositories for ${installation.id}`);
+        }),
+        mergeMap((installation) =>
+          from(
+            userOctokit.paginate(
+              userOctokit.rest.apps.listInstallationReposForAuthenticatedUser,
+              {
+                per_page: 100,
+                installation_id: installation.id,
+              },
+            ) as unknown as Awaited<
+              ReturnType<
+                typeof userOctokit.rest.apps.listInstallationReposForAuthenticatedUser
+              >
+            >['data']['repositories'][],
+          ).pipe(
+            mergeMap((repositories) => from(repositories)),
+            tap((repository) => {
+              this.logger.info(
+                `Fetching schedules for ${repository.full_name}`,
+              );
+            }),
+            mergeMap((repository) =>
+              from(
+                this.schedulerService.deleteSchedules(
+                  installation.id,
+                  repository.id,
+                ),
+              ),
+            ),
+          ),
+        ),
       )
-      .pop();
-
-    return {
-      repoName: repoName,
-      lockTime: lockTime,
-      unlockTime: unlockTime,
-    };
+      .forEach(() => {});
   }
 
   async updateSchedules(
-    installationId: number,
+    userOctokit: Octokit,
+    repoIds: number[],
     lockTime: number,
     unlockTime: number,
     timeZone: string,
-  ) {
-    const octokit = this.octokitFn(installationId);
-
-    await lastValueFrom(
-      from(
-        (await octokit.paginate(
-          octokit.rest.apps.listReposAccessibleToInstallation,
-        )) as unknown as Awaited<
-          ReturnType<typeof octokit.rest.apps.listReposAccessibleToInstallation>
-        >['data']['repositories'],
-      ).pipe(
-        mergeMap((repo) => {
-          return from(
-            this.schedulerService.updateSchedules(
-              installationId,
-              repo.full_name,
-              lockTime,
-              unlockTime,
-              timeZone,
-            ),
-          );
+  ): Promise<void> {
+    return await from(
+      userOctokit.paginate(
+        userOctokit.rest.apps.listInstallationsForAuthenticatedUser,
+        { per_page: 100 },
+      ) as unknown as Awaited<
+        ReturnType<
+          typeof userOctokit.rest.apps.listInstallationsForAuthenticatedUser
+        >
+      >['data']['installations'][],
+    )
+      .pipe(
+        mergeMap((installations) => from(installations)),
+        tap((installation) => {
+          this.logger.info(`Listing repositories for ${installation.id}`);
         }),
-        toArray(),
-      ),
-    );
+        mergeMap((installation) =>
+          from(
+            userOctokit.paginate(
+              userOctokit.rest.apps.listInstallationReposForAuthenticatedUser,
+              {
+                per_page: 100,
+                installation_id: installation.id,
+              },
+            ) as unknown as Awaited<
+              ReturnType<
+                typeof userOctokit.rest.apps.listInstallationReposForAuthenticatedUser
+              >
+            >['data']['repositories'][],
+          ).pipe(
+            mergeMap((repositories) => from(repositories)),
+            filter((repository) => {
+              return !repoIds.length || repoIds.includes(repository.id);
+            }),
+            tap((repository) => {
+              this.logger.info(
+                `Fetching schedules for ${repository.full_name}`,
+              );
+            }),
+            mergeMap((repository) =>
+              from(
+                this.schedulerService.deleteSchedules(
+                  installation.id,
+                  repository.id,
+                ),
+              ).pipe(
+                mergeMap(() =>
+                  forkJoin({
+                    lock: from(
+                      this.schedulerService.createSchedule(
+                        installation.id,
+                        repository.id,
+                        repository.full_name,
+                        lockTime,
+                        timeZone,
+                        'locker',
+                      ),
+                    ),
+                    unlock: from(
+                      this.schedulerService.createSchedule(
+                        installation.id,
+                        repository.id,
+                        repository.full_name,
+                        unlockTime,
+                        timeZone,
+                        'unlocker',
+                      ),
+                    ),
+                  }),
+                ),
+              ),
+            ),
+            toArray(),
+          ),
+        ),
+      )
+      .forEach(() => {});
   }
 }

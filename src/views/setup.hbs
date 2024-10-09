@@ -1,4 +1,3 @@
-{{#each installationIds}}
 <form action="/app/setup" method="post">
   <label for="lock-time">Lock Time:</label>
   <select name="lock_time" id="lock-time">
@@ -56,17 +55,15 @@
   </select>
   <label for="timezone">Timezone:</label>
   <select name="timezone" id="timezone">
-    {{#each ../timezones}}
+    {{#each timezones}}
       <option value="{{this}}">{{this}}</option>
     {{/each}}
   </select>
-  <input type="hidden" name="installation_id" value="{{this}}">
   <button type="submit">Submit</button>
-</form>
-{{/each}}
 <table>
   <thead>
   <tr>
+    <th></th>
     <th>Repository Name</th>
     <th>Lock Time</th>
     <th>Unlock Time</th>
@@ -75,6 +72,7 @@
   <tbody>
   {{#each repoSchedules}}
     <tr>
+      <td><input name="repo_ids[]" id="{{this.repoId}}" type="checkbox" value="{{this.repoId}}"></td>
       <td>{{this.repoName}}</td>
       <td>{{this.lockTime}}</td>
       <td>{{this.unlockTime}}</td>
@@ -82,3 +80,7 @@
   {{/each}}
   </tbody>
 </table>
+</form>
+<form action="/app/reset" method="post">
+  <button type="submit">Delete</button>
+</form>

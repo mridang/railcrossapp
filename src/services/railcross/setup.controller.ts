@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Get,
@@ -11,31 +10,37 @@ import {
   Req,
   UnauthorizedException,
 } from '@nestjs/common';
-import { IsInt, Max, Min } from 'class-validator';
+import { IsArray, IsInt, IsOptional, Max, Min } from 'class-validator';
 import { IsSupportedTimeZone } from './timezone.validator';
 import RailcrossService from './railcross.service';
 import { Request } from 'express';
-import { from, mergeMap, map, toArray, lastValueFrom } from 'rxjs';
-import Repository from '../github/types';
 import { Octokit } from '@octokit/rest';
 import { OctokitImpl } from '../github/octokit/types';
+import { Expose, Type } from 'class-transformer';
 
 class ScheduleDto {
   @IsInt()
   @Min(0)
   @Max(23)
-  lock_time!: number;
+  @Expose({ name: 'lock_time' })
+  lockTime!: number;
 
   @IsInt()
   @Min(0)
   @Max(23)
-  unlock_time!: number;
-
-  @IsInt()
-  installation_id!: number;
+  @Expose({ name: 'unlock_time' })
+  unlockTime!: number;
 
   @IsSupportedTimeZone({ message: 'Timezone is not valid' })
+  @Expose({ name: 'timezone' })
   timezone!: string;
+
+  @IsArray()
+  @IsInt({ each: true })
+  @Type(() => Number)
+  @IsOptional()
+  @Expose({ name: 'repo_ids' })
+  repoIds!: number[];
 }
 
 @Controller('app')
@@ -50,91 +55,55 @@ export class SetupController {
     //
   }
 
-  @Get('setup')
+  @Get()
   @Render('setup')
-  async showSetup(@Req() request: Request) {
-    // noinspection TypeScriptUnresolvedReference
-    // @ts-expect-error since
-    const accessToken: string = request.user.accessToken;
-    if (!accessToken) {
+  async showSetup(@Req() request: Request & { user: { accessToken: string } }) {
+    if (!request.user.accessToken) {
       throw new UnauthorizedException('Unable to deduce allowed installations');
     } else {
-      const octokit = this.octokitFn(accessToken);
-      const userRepos = await lastValueFrom(
-        from(
-          octokit.paginate(
-            octokit.rest.apps.listInstallationsForAuthenticatedUser,
-            {
-              per_page: 100,
-            },
-          ),
-        ).pipe(
-          mergeMap((installations) =>
-            from(installations.map((installation) => installation.id)).pipe(
-              mergeMap((installationId) =>
-                from(
-                  octokit.paginate(
-                    octokit.rest.apps.listInstallationReposForAuthenticatedUser,
-                    {
-                      per_page: 100,
-                      installation_id: installationId,
-                    },
-                  ),
-                ).pipe(
-                  map((repositories) =>
-                    // @ts-expect-error due to https://github.com/octokit/plugin-paginate-rest.js/issues/350
-                    repositories.map((repository) => ({
-                      ownerRepo: new Repository(repository.full_name),
-                      installationId,
-                    })),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          toArray(),
-          map((flattened) => flattened.flat()),
-        ),
-      );
-
-      const repoSchedules = await Promise.all(
-        userRepos.map(async (userRepo) => {
-          return await this.railcrossService.listSchedules(
-            userRepo.ownerRepo.fullName,
-          );
-        }),
-      );
+      const octokit = this.octokitFn(request.user.accessToken);
+      const repoSchedules = await this.railcrossService.listSchedules(octokit);
 
       return {
         timezones: Intl.supportedValuesOf('timeZone'),
         repoSchedules,
-        installationIds: userRepos
-          .map((userRepo) => userRepo.installationId)
-          .filter((value, index, self) => self.indexOf(value) === index),
       };
     }
   }
 
   @Post('setup')
-  @Redirect('/app/setup', HttpStatus.FOUND)
+  @Redirect('/app', HttpStatus.FOUND)
   async updateSetup(
     @Body() scheduleDto: ScheduleDto,
-    @Req() request: Request & { user: { installationIds: number[] } },
+    @Req()
+    request: Request & {
+      user: { accessToken: string };
+    },
   ) {
-    const installationIds: number[] = request.user.installationIds;
-    if (!installationIds.includes(scheduleDto.installation_id)) {
+    if (!request.user.accessToken) {
       throw new UnauthorizedException('Unable to deduce allowed installations');
     } else {
-      if (scheduleDto.lock_time <= scheduleDto.unlock_time) {
-        throw new BadRequestException('Lock time must be after unlock time.');
-      }
+      const octokit = this.octokitFn(request.user.accessToken);
 
       await this.railcrossService.updateSchedules(
-        scheduleDto.installation_id,
-        scheduleDto.lock_time,
-        scheduleDto.unlock_time,
+        octokit,
+        scheduleDto.repoIds,
+        scheduleDto.lockTime,
+        scheduleDto.unlockTime,
         scheduleDto.timezone,
       );
+    }
+  }
+
+  @Post('reset')
+  @Redirect('/app', HttpStatus.FOUND)
+  async reset(@Req() request: Request & { user: { accessToken: string } }) {
+    if (!request.user.accessToken) {
+      throw new UnauthorizedException('Unable to deduce allowed installations');
+    } else {
+      const octokit = this.octokitFn(request.user.accessToken);
+
+      await this.railcrossService.resetSchedules(octokit);
     }
   }
 }

@@ -8,12 +8,12 @@ import {
   GetScheduleGroupCommand,
   ListSchedulesCommand,
   ListSchedulesCommandOutput,
-  paginateListSchedules,
+  ResourceNotFoundException,
   SchedulerClient,
-  UpdateScheduleCommand,
 } from '@aws-sdk/client-scheduler';
 import { roleName, scheduleGroup } from '../../constants';
 import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { from, mergeMap, tap, EMPTY, filter } from 'rxjs';
 
 @Injectable()
 export default class SchedulerService implements OnModuleInit {
@@ -66,162 +66,94 @@ export default class SchedulerService implements OnModuleInit {
     }
   }
 
-  async addLockSchedules(repoName: string, installationId: number) {
-    const unlockCommand = new CreateScheduleCommand({
-      Name: `${repoName}-unlock`.replace(/[^0-9a-zA-Z-_.]/g, '--'),
-      GroupName: this.group,
-      ScheduleExpressionTimezone: 'UTC',
-      ScheduleExpression: `cron(0 8 ? * * *)`,
-      FlexibleTimeWindow: { Mode: FlexibleTimeWindowMode.OFF },
-      Target: {
-        Arn: `arn:aws:lambda:${process.env.AWS_REGION}:${process.env.ACCOUNT_ID}:function:railcross-${process.env.NODE_ENV}-unlocker`,
-        RoleArn: this.schedulerRoleArn,
-        Input: JSON.stringify({
-          repo_name: repoName,
-          installation_id: installationId,
-        }),
-      },
-    });
-    {
-      const { Name, ScheduleExpression: Crontab } = unlockCommand.input;
-      this.logger.log(
-        `Adding a unlock schedule named ${Name} to run at ${Crontab} in group ${this.group}`,
-      );
-    }
-    await this.scheduler.send(unlockCommand);
-
-    const lockCommand = new CreateScheduleCommand({
-      Name: `${repoName}-lock`.replace(/[^0-9a-zA-Z-_.]/g, '--'),
-      GroupName: this.group,
-      ScheduleExpressionTimezone: 'UTC',
-      ScheduleExpression: `cron(0 16 ? * * *)`,
-      FlexibleTimeWindow: { Mode: FlexibleTimeWindowMode.OFF },
-      Target: {
-        Arn: `arn:aws:lambda:${process.env.AWS_REGION}:${process.env.ACCOUNT_ID}:function:railcross-${process.env.NODE_ENV}-locker`,
-        RoleArn: this.schedulerRoleArn,
-        Input: JSON.stringify({
-          repo_name: repoName,
-          installation_id: installationId,
-        }),
-      },
-    });
-
-    {
-      const { Name, ScheduleExpression: Crontab } = lockCommand.input;
-      this.logger.log(
-        `Adding a lock schedule named ${Name} to run at ${Crontab} in group ${this.group}`,
-      );
-    }
-    await this.scheduler.send(lockCommand);
-  }
-
-  async updateSchedules(
+  async deleteSchedules(
     installationId: number,
-    repoName: string,
-    lockTime: number,
-    unlockTime: number,
-    timeZone: string,
-  ) {
-    for await (const page of paginateListSchedules(
-      {
-        client: this.scheduler,
-        pageSize: 100,
-      },
-      {
-        GroupName: this.group,
-        NamePrefix: repoName.replace(/[^0-9a-zA-Z-_.]/g, '--'),
-        MaxResults: 100,
-      },
-    )) {
-      for (const schedule of page.Schedules || []) {
-        this.logger.log(
-          `Updating all schedules named ${schedule.Name}* in group ${this.group}`,
-        );
-        if (schedule.Name === undefined) {
-          throw new Error();
-        } else if (schedule.Name.includes('-lock')) {
-          await this.scheduler.send(
-            new UpdateScheduleCommand({
-              GroupName: this.group,
-              ScheduleExpressionTimezone: timeZone,
-              ScheduleExpression: `cron(0 ${lockTime} ? * * *)`,
-              FlexibleTimeWindow: { Mode: FlexibleTimeWindowMode.OFF },
-              Target: {
-                Arn: `arn:aws:lambda:${process.env.AWS_REGION}:${process.env.ACCOUNT_ID}:function:railcross-${process.env.NODE_ENV}-locker`,
-                RoleArn: this.schedulerRoleArn,
-                Input: JSON.stringify({
-                  repo_name: repoName,
-                  installation_id: installationId,
-                }),
-              },
-              Name: schedule.Name,
-            }),
+    repoId?: number,
+  ): Promise<void> {
+    await from(
+      this.scheduler.send(
+        new ListSchedulesCommand({
+          GroupName: this.group,
+          NamePrefix: `${installationId}.${repoId === undefined ? '' : repoId + '.'}`,
+          MaxResults: 100,
+        }),
+      ),
+    )
+      .pipe(
+        mergeMap((res: ListSchedulesCommandOutput) =>
+          from(res.Schedules || []),
+        ),
+        filter((schedule) => {
+          return (
+            schedule?.Name?.startsWith(
+              `${installationId}.${repoId === undefined ? '' : repoId + '.'}`,
+            ) || false
           );
-        } else if (schedule.Name.includes('-unlock')) {
-          await this.scheduler.send(
-            new UpdateScheduleCommand({
-              GroupName: this.group,
-              ScheduleExpressionTimezone: timeZone,
-              ScheduleExpression: `cron(0 ${unlockTime} ? * * *)`,
-              FlexibleTimeWindow: { Mode: FlexibleTimeWindowMode.OFF },
-              Target: {
-                Arn: `arn:aws:lambda:${process.env.AWS_REGION}:${process.env.ACCOUNT_ID}:function:railcross-${process.env.NODE_ENV}-unlocker`,
-                RoleArn: this.schedulerRoleArn,
-                Input: JSON.stringify({
-                  repo_name: repoName,
-                  installation_id: installationId,
-                }),
-              },
-              Name: schedule.Name,
-            }),
+        }),
+        tap((schedule) => {
+          this.logger.log(
+            `Deleting schedule "${schedule.Name}" in group ${this.group}`,
           );
-        } else {
-          throw new Error();
-        }
-      }
-    }
+        }),
+        mergeMap((schedule) =>
+          schedule
+            ? this.scheduler.send(
+                new DeleteScheduleCommand({
+                  Name: schedule.Name,
+                  GroupName: this.group,
+                }),
+              )
+            : EMPTY,
+        ),
+      )
+      .forEach(() => {});
   }
 
-  async deleteSchedules(repoName: string) {
-    const schedules: ListSchedulesCommandOutput = await this.scheduler.send(
-      new ListSchedulesCommand({
+  async createSchedule(
+    installationId: number,
+    repoId: number,
+    repoName: string,
+    cronTime: number,
+    timeZone: string,
+    taskName: string,
+  ) {
+    return await this.scheduler.send(
+      new CreateScheduleCommand({
+        Name: `${installationId}.${repoId}.${taskName}`,
         GroupName: this.group,
-        NamePrefix: repoName.replace(/[^0-9a-zA-Z-_.]/g, '--'),
-        MaxResults: 100,
+        ScheduleExpressionTimezone: timeZone,
+        ScheduleExpression: `cron(0 ${cronTime} ? * * *)`,
+        FlexibleTimeWindow: { Mode: FlexibleTimeWindowMode.OFF },
+        Target: {
+          Arn: `arn:aws:lambda:${process.env.AWS_REGION}:${process.env.ACCOUNT_ID}:function:railcross-${process.env.NODE_ENV}-${taskName}`,
+          RoleArn: this.schedulerRoleArn,
+          Input: JSON.stringify({
+            repo_name: repoName,
+            installation_id: installationId,
+          }),
+        },
       }),
     );
+  }
 
-    for (const schedule of schedules.Schedules || []) {
-      this.logger.log(
-        `Deleting all schedules named ${schedule.Name}* in group ${this.group}`,
-      );
-      await this.scheduler.send(
-        new DeleteScheduleCommand({
-          Name: schedule.Name,
+  async getSchedule(
+    installationId: number,
+    repoId: number,
+    taskName: string,
+  ): Promise<GetScheduleCommandOutput | null> {
+    try {
+      return await this.scheduler.send(
+        new GetScheduleCommand({
+          Name: `${installationId}.${repoId}.${taskName}`,
           GroupName: this.group,
         }),
       );
+    } catch (error) {
+      if (error instanceof ResourceNotFoundException) {
+        return null;
+      } else {
+        throw error;
+      }
     }
-  }
-
-  async listSchedules(repoName: string): Promise<GetScheduleCommandOutput[]> {
-    this.logger.log(`Listing schedules for ${repoName}`);
-    const schedules: ListSchedulesCommandOutput = await this.scheduler.send(
-      new ListSchedulesCommand({
-        GroupName: this.group,
-        NamePrefix: repoName.replace(/[^0-9a-zA-Z-_.]/g, '--'),
-      }),
-    );
-
-    return await Promise.all(
-      (schedules.Schedules || []).map(async (schedule) => {
-        return await this.scheduler.send(
-          new GetScheduleCommand({
-            GroupName: this.group,
-            Name: schedule.Name,
-          }),
-        );
-      }),
-    );
   }
 }
