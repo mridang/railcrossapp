@@ -20,10 +20,11 @@ import murmurhash from 'murmurhash';
 import { ensure } from '../../../utils/ensure';
 import { type Fetch } from '@octokit/types';
 import { AuthConfig } from './auth.interfaces';
-import { from, forkJoin, map, switchMap, lastValueFrom } from 'rxjs';
+import { from, forkJoin, map, switchMap, lastValueFrom, toArray } from 'rxjs';
 import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
 import { CryptoImpl, FetchImpl } from '@mridang/nestjs-defaults';
+import { doPaginate } from '../octokit/utils/paginate';
 
 class CallbackDto {
   @IsString()
@@ -141,12 +142,19 @@ export class AuthController {
                   per_page: 100,
                 }),
               ),
-              current: from(
-                octokit.paginate(
-                  octokit.rest.apps.listInstallationsForAuthenticatedUser,
-                  { per_page: 100 },
-                ),
-              ),
+              current: doPaginate(async (page: number) => {
+                const response =
+                  await octokit.rest.apps.listInstallationsForAuthenticatedUser(
+                    {
+                      per_page: 100,
+                      page,
+                    },
+                  );
+                return {
+                  totalRows: response.data.total_count,
+                  resultItems: response.data.installations,
+                };
+              }).pipe(toArray()),
             }).pipe(
               map(({ user, repositories, current }) => ({
                 accessToken,

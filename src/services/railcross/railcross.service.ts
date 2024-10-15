@@ -12,6 +12,7 @@ import {
   filter,
 } from 'rxjs';
 import { Logger } from 'testcontainers/build/common';
+import { doPaginate } from '../github/octokit/utils/paginate';
 
 @Injectable()
 export default class RailcrossService {
@@ -31,35 +32,35 @@ export default class RailcrossService {
     }[]
   > {
     return await lastValueFrom(
-      from(
-        userOctokit.paginate(
-          userOctokit.rest.apps.listInstallationsForAuthenticatedUser,
-          { per_page: 100 },
-        ) as unknown as Awaited<
-          ReturnType<
-            typeof userOctokit.rest.apps.listInstallationsForAuthenticatedUser
-          >
-        >['data']['installations'][],
-      ).pipe(
-        mergeMap((installations) => from(installations)),
+      doPaginate(async (page: number) => {
+        const response =
+          await userOctokit.rest.apps.listInstallationsForAuthenticatedUser({
+            per_page: 100,
+            page,
+          });
+        return {
+          totalRows: response.data.total_count,
+          resultItems: response.data.installations,
+        };
+      }).pipe(
         tap((installation) => {
           this.logger.info(`Listing repositories for ${installation.id}`);
         }),
         mergeMap((installation) =>
-          from(
-            userOctokit.paginate(
-              userOctokit.rest.apps.listInstallationReposForAuthenticatedUser,
-              {
-                per_page: 100,
-                installation_id: installation.id,
-              },
-            ) as unknown as Awaited<
-              ReturnType<
-                typeof userOctokit.rest.apps.listInstallationReposForAuthenticatedUser
-              >
-            >['data']['repositories'][],
-          ).pipe(
-            mergeMap((repositories) => from(repositories)),
+          doPaginate(async (page: number) => {
+            const response =
+              await userOctokit.rest.apps.listInstallationReposForAuthenticatedUser(
+                {
+                  installation_id: installation.id,
+                  per_page: 100,
+                  page,
+                },
+              );
+            return {
+              totalRows: response.data.total_count,
+              resultItems: response.data.repositories,
+            };
+          }).pipe(
             tap((repository) => {
               this.logger.info(
                 `Fetching schedules for ${repository.full_name}`,
@@ -111,36 +112,36 @@ export default class RailcrossService {
   }
 
   async resetSchedules(userOctokit: Octokit): Promise<void> {
-    return await from(
-      userOctokit.paginate(
-        userOctokit.rest.apps.listInstallationsForAuthenticatedUser,
-        { per_page: 100 },
-      ) as unknown as Awaited<
-        ReturnType<
-          typeof userOctokit.rest.apps.listInstallationsForAuthenticatedUser
-        >
-      >['data']['installations'][],
-    )
+    return await doPaginate(async (page: number) => {
+      const response =
+        await userOctokit.rest.apps.listInstallationsForAuthenticatedUser({
+          per_page: 100,
+          page,
+        });
+      return {
+        totalRows: response.data.total_count,
+        resultItems: response.data.installations,
+      };
+    })
       .pipe(
-        mergeMap((installations) => from(installations)),
         tap((installation) => {
           this.logger.info(`Listing repositories for ${installation.id}`);
         }),
         mergeMap((installation) =>
-          from(
-            userOctokit.paginate(
-              userOctokit.rest.apps.listInstallationReposForAuthenticatedUser,
-              {
-                per_page: 100,
-                installation_id: installation.id,
-              },
-            ) as unknown as Awaited<
-              ReturnType<
-                typeof userOctokit.rest.apps.listInstallationReposForAuthenticatedUser
-              >
-            >['data']['repositories'][],
-          ).pipe(
-            mergeMap((repositories) => from(repositories)),
+          doPaginate(async (page: number) => {
+            const response =
+              await userOctokit.rest.apps.listInstallationReposForAuthenticatedUser(
+                {
+                  installation_id: installation.id,
+                  per_page: 100,
+                  page,
+                },
+              );
+            return {
+              totalRows: response.data.total_count,
+              resultItems: response.data.repositories,
+            };
+          }).pipe(
             tap((repository) => {
               this.logger.info(
                 `Fetching schedules for ${repository.full_name}`,
@@ -167,36 +168,36 @@ export default class RailcrossService {
     unlockTime: number,
     timeZone: string,
   ): Promise<void> {
-    return await from(
-      userOctokit.paginate(
-        userOctokit.rest.apps.listInstallationsForAuthenticatedUser,
-        { per_page: 100 },
-      ) as unknown as Awaited<
-        ReturnType<
-          typeof userOctokit.rest.apps.listInstallationsForAuthenticatedUser
-        >
-      >['data']['installations'][],
-    )
+    return await doPaginate(async (page: number) => {
+      const response =
+        await userOctokit.rest.apps.listInstallationsForAuthenticatedUser({
+          per_page: 100,
+          page,
+        });
+      return {
+        totalRows: response.data.total_count,
+        resultItems: response.data.installations,
+      };
+    })
       .pipe(
-        mergeMap((installations) => from(installations)),
         tap((installation) => {
           this.logger.info(`Listing repositories for ${installation.id}`);
         }),
         mergeMap((installation) =>
-          from(
-            userOctokit.paginate(
-              userOctokit.rest.apps.listInstallationReposForAuthenticatedUser,
-              {
-                per_page: 100,
-                installation_id: installation.id,
-              },
-            ) as unknown as Awaited<
-              ReturnType<
-                typeof userOctokit.rest.apps.listInstallationReposForAuthenticatedUser
-              >
-            >['data']['repositories'][],
-          ).pipe(
-            mergeMap((repositories) => from(repositories)),
+          doPaginate(async (page: number) => {
+            const response =
+              await userOctokit.rest.apps.listInstallationReposForAuthenticatedUser(
+                {
+                  installation_id: installation.id,
+                  per_page: 100,
+                  page,
+                },
+              );
+            return {
+              totalRows: response.data.total_count,
+              resultItems: response.data.repositories,
+            };
+          }).pipe(
             filter((repository) => {
               return !repoIds.length || repoIds.includes(repository.id);
             }),
