@@ -7,7 +7,7 @@ import {
   RawBodyRequest,
   Req,
 } from '@nestjs/common';
-import { Request } from 'express';
+import { Request } from '@mridang/nestjs-defaults';
 import { WebhookEventName } from '@octokit/webhooks-types';
 import { WebhookConfig, WebhookHandler } from './webhook.interfaces';
 import { Webhooks } from '@octokit/webhooks';

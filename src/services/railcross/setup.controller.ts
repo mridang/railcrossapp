@@ -13,7 +13,7 @@ import {
 import { IsArray, IsInt, IsOptional, Max, Min } from 'class-validator';
 import { IsSupportedTimeZone } from './timezone.validator';
 import RailcrossService from './railcross.service';
-import { Request } from 'express';
+import { Request } from '@mridang/nestjs-defaults';
 import { Octokit } from '@octokit/rest';
 import { OctokitImpl } from '../github/octokit/types';
 import { Expose, Type } from 'class-transformer';
