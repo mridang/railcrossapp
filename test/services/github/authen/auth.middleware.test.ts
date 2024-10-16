@@ -1,5 +1,5 @@
 import { expect } from '@jest/globals';
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Request, Response } from '@mridang/nestjs-defaults';
 import { AuthMiddleware } from '../../../../src/services/github/authen/auth.middleware';
 import { UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';

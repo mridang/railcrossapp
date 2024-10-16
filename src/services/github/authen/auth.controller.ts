@@ -14,7 +14,6 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Octokit } from '@octokit/rest';
-import { Response, Request } from 'express';
 import { IsString, Length } from 'class-validator';
 import murmurhash from 'murmurhash';
 import { ensure } from '../../../utils/ensure';
@@ -23,7 +22,12 @@ import { AuthConfig } from './auth.interfaces';
 import { from, forkJoin, map, switchMap, lastValueFrom, toArray } from 'rxjs';
 import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
-import { CryptoImpl, FetchImpl } from '@mridang/nestjs-defaults';
+import {
+  CryptoImpl,
+  FetchImpl,
+  Response,
+  Request,
+} from '@mridang/nestjs-defaults';
 import { doPaginate } from '../octokit/utils/paginate';
 
 class CallbackDto {

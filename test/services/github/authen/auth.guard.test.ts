@@ -10,7 +10,7 @@ import {
   Type,
   WsArgumentsHost,
 } from '@nestjs/common/interfaces';
-import { Request } from 'express';
+import { Request } from '@mridang/nestjs-defaults';
 
 describe('auth.guard tests', () => {
   class MockExecutionContext implements ExecutionContext {
