@@ -121,7 +121,7 @@ export default class ProtectionService {
         branch: repository.default_branch,
         lock_branch: lockState,
       });
-    } catch (error) {
+    } catch {
       this.logger.log(`The ${repository.default_branch} isn't protected.`);
 
       await octokit.repos.updateBranchProtection({

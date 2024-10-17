@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import ProtectionService from './protection.service';
 import SchedulerService from './scheduler.service';
 import { roleName, scheduleGroup } from '../../constants';
-import RailcrossProbot from './probot.handler';
 import { SchedulerClient } from '@aws-sdk/client-scheduler';
 import { SetupController } from './setup.controller';
 import RailcrossService from './railcross.service';
@@ -17,7 +16,6 @@ import ProbotHandler from './probot.handler';
     ProtectionService,
     SchedulerService,
     RailcrossService,
-    RailcrossProbot,
     {
       provide: 'SCHEDULER_CLIENT',
       useFactory: () => {
