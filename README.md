@@ -1,5 +1,7 @@
 # Railcross for GitHub
 
+![Status](https://railcross.agarwal.la/version.svg)
+
 Railcross prevents your teams from merging pull requests outside
 merge windows.
 
