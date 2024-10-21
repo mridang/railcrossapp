@@ -27,7 +27,7 @@ async function bootstrap() {
     );
 
     nestApp.useLogger(nestApp.get(BetterLogger));
-    configure(nestApp, __dirname);
+    configure(nestApp);
     await nestApp.init();
 
     cachedServer = serverlessExpress({
