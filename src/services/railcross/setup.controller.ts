@@ -6,7 +6,6 @@ import {
   Inject,
   Post,
   Redirect,
-  Render,
   Req,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -17,6 +16,7 @@ import { Request } from '@mridang/nestjs-defaults';
 import { Octokit } from '@octokit/rest';
 import { OctokitImpl } from '../github/octokit/types';
 import { Expose, Type } from 'class-transformer';
+import setupView from './setup.view';
 
 class ScheduleDto {
   @IsInt()
@@ -56,7 +56,6 @@ export class SetupController {
   }
 
   @Get()
-  @Render('setup')
   async showSetup(@Req() request: Request & { user: { accessToken: string } }) {
     if (!request.user.accessToken) {
       throw new UnauthorizedException('Unable to deduce allowed installations');
@@ -64,10 +63,7 @@ export class SetupController {
       const octokit = this.octokitFn(request.user.accessToken);
       const repoSchedules = await this.railcrossService.listSchedules(octokit);
 
-      return {
-        timezones: Intl.supportedValuesOf('timeZone'),
-        repoSchedules,
-      };
+      return setupView(repoSchedules);
     }
   }
 

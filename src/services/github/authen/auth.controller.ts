@@ -5,7 +5,6 @@ import {
   Optional,
   Post,
   Query,
-  Render,
   Req,
   Res,
   UnauthorizedException,
@@ -29,6 +28,7 @@ import {
   Request,
 } from '@mridang/nestjs-defaults';
 import { doPaginate } from '../octokit/utils/paginate';
+import expiredView from './expired.view';
 
 class CallbackDto {
   @IsString()
@@ -74,11 +74,8 @@ export class AuthController {
   }
 
   @Get('/reauthenticate')
-  @Render('expired')
   expired() {
-    return {
-      //
-    };
+    return expiredView();
   }
 
   @Post('/reauthenticate')
